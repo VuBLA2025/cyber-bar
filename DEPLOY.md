@@ -21,9 +21,16 @@ cổng **4193**, không chạm tới Sàn Vui cũ ở sanvui.bla.io.vn.
   Galaxy 1000, Lion 29999 — spotlight 4.5–7.5s theo tổng xu. Lệnh chat:
   `nhay/dance/quay`, `uong/drink/bia/ruou`, `nhaylen/jump`, `xoay/spin`,
   `123zo/cheers/zo`, `dj` lên bàn DJ.
-- **Layout là bản ngang (landscape), KHÔNG phải 9:16 dọc** như stage các game
-  kia. Đưa vào OBS dọc TikTok LIVE sẽ bị cắt khung — dùng nguồn trình duyệt
-  ngang hoặc để khung 16:9.
+- **Bố cục từ 2026-11-07: dọc 9:16 + panel riêng** — `/` là trang điều
+  khiển (`public/panel.html`: đăng nhập `PANEL_KEY`, kết nối TikTok, trạng
+  thái live, bật/tắt tiếng stage, thử chat/quà/like, link stage 540×960),
+  `/stage` là sàn dọc 9:16 (`public/index.html` + class `stage-916` khi mở
+  ở `/stage`: header gọn + hype meter xuống hàng 2, canvas sàn nhảy ở
+  trên, sidebar BXH/chat xuống dưới chiếm 34%, ẩn toolbar thử quà và nút
+  nhạc/kết nối/OBS; stage tự mở WS `/ws` ở chế độ chỉ-nghe — live thì tắt
+  bot Demo, hết live thì Demo chạy lại; có nút “Chạm để bật tiếng game”
+  và nhận lệnh bật/tắt tiếng từ panel qua WS). Xem thêm mục thay đổi bên
+  dưới.
 
 ## Stack
 
@@ -79,8 +86,54 @@ cổng **4193**, không chạm tới Sàn Vui cũ ở sanvui.bla.io.vn.
   compose build từ GitHub PHẢI có `build: {context: ., dockerfile:
   Dockerfile}` như Lớp Học Chữ / Đi Chùa (Sàn Vui 3D không có vì chưa bao
   giờ deploy từ GitHub). Đã sửa file, push lại, deploy lại.
-- Trạng thái deploy 2026-11-07 — ĐANG DEPLOY LẠI (sau khi sửa build).
+- Trạng thái deploy 2026-11-07 — **ĐÃ LIVE**:
+  - Repo: `VuBLA2025/cyber-bar`, nhánh `main`, commit `f7ec486` (10 file)
+    + `b6d7281` (sửa docker-compose thêm `build:`).
+  - Dokploy: project `Cyber Bar LIVE` (`eNOcqXkuv8T982biX5P87`,
+    environment production `SXn9bPMePFiJ0DUpCTtsm`), compose `cyber-bar`
+    (`s0OUHmxqeDtbZPFGjHGRR`, sourceType github, repo VuBLA2025/cyber-bar
+    nhánh main, composePath `./docker-compose.yml`, `githubId`
+    `0-f_X4vn1CYb3EnTqIaQo`, `PANEL_KEY` đã đặt trong env), domain
+    `cyberbar.bla.io.vn` (`PC-ceXONBVqCkpaqrHERs`, port 4193, https:true,
+    Let's Encrypt).
+  - Deploy 2: `fHgsYP65b8uvbdpEmt-SB` status `done` 2026-11-07 ~11:35 UTC.
+  - **LIVE: https://cyberbar.bla.io.vn/ — kiểm chứng cùng ngày:** `/` 200
+    đúng title, `/stage` 200, `/api/status` 200 JSON (`mode:'idle',
+    game:'cyber-bar'`), `/api/health` 200, test/emit không key 403 / đúng
+    key 200, WS `wss://cyberbar.bla.io.vn/ws` bắt tay 101 + nhận frame
+    `status` ngay. 8 game còn lại kiểm tra cùng lúc vẫn 200.
+  - Lưu ý: test WS bằng node `ws` trực tiếp từ VM này timeout — do VM
+    không có egress trực tiếp cho client WS (không qua proxy), không phải
+    lỗi server; curl qua proxy bắt tay 101 bình thường.
+
+## Thay đổi 2026-11-07 — dọc 9:16 + panel riêng (CHƯA deploy)
+
+- `public/index.html` (game): thêm CSS `body.stage-916` (khung
+  `min(100vw, 100dvh*9/16)` căn giữa nền đen, `main` thành cột, canvas
+  trên + sidebar dưới 34%, ẩn `#bottom-controls`/`#obs-hint`/nút nhạc,
+  kết nối, OBS, hype meter xuống hàng 2) + JS stage mode (`IS_STAGE`
+  khi pathname `/stage`: thêm class, nút `#stage-sound-btn` chạm 1 lần
+  để bật tiếng + resume AudioContext, `connectStageListenWS()` mở WS
+  `/ws` chỉ-nghe: live → tắt Demo, idle → Demo chạy lại, nhận
+  `soundOn`/`soundOff` từ panel). Vị trí vũ công vốn đã tỉ lệ theo
+  `cw`/`ch` nên canvas dọc vẫn đúng, không cần sửa engine vẽ.
+- `public/panel.html` (mới): trang điều khiển ở `/` — đăng nhập
+  `PANEL_KEY` (cookie 30 ngày + `x-panel-key`, lưu sessionStorage),
+  trạng thái live poll `/api/status` 2s, kết nối/ngắt TikTok, bật/tắt
+  tiếng stage, thử chat/quà/like, link stage + nút sao chép.
+- `server.js`: thêm `POST /api/login`, `GET /api/me` (cookie
+  `panel_auth` sha256), `POST /api/control` (`soundOn`/`soundOff`,
+  cần auth, broadcast WS + lưu `state.soundOn` để stage mới mở cũng
+  biết); route `/` → panel, `/stage` + `/game` → game (đăng ký trước
+  `express.static` để `/` không bị `index.html` của game chiếm).
+- Test local (PORT=4193, PANEL_KEY=test): `/` ra panel, `/stage` ra
+  game có `stage-916`, login sai 403 / đúng 200 + cookie, `/api/me`
+  theo cookie, control không key 403 / đúng key 200 + `soundOn:true`
+  trong `/api/status`. Còn chờ: xem stage 9:16 bằng mắt (screenshot
+  540×960 qua trình duyệt) rồi mới push + deploy.
+
+## Chưa kiểm chứng
 
 - Kết nối TikTok LIVE thật, quà/chat/like thật chạy vào game, nhạc + hiệu
   ứng nghe/nhìn bằng mắt trên live thật.
-- Hiển thị trên OBS khổ ngang trong TikTok LIVE Studio.
+- Hiển thị trên OBS khổ dọc 9:16 trong TikTok LIVE Studio.

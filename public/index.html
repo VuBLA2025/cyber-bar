@@ -63,6 +63,19 @@
       white-space: nowrap;
       animation: marquee 12s linear infinite;
     }
+
+    /* --- 9:16 STAGE MODE (/stage): khung dọc cho OBS/TikTok LIVE Studio --- */
+    body.stage-916 { background:#000; align-items:center; }
+    body.stage-916 > header, body.stage-916 > main, body.stage-916 > footer { width:min(100vw, calc(100dvh * 9 / 16)); margin-left:auto; margin-right:auto; }
+    body.stage-916 main { flex-direction:column; }
+    body.stage-916 #canvas-container { flex:1 1 auto; width:100%; height:auto; min-height:0; }
+    body.stage-916 #sidebar-panel { width:100%; height:34%; flex:0 0 34%; border-left:none; border-top:1px solid rgba(168,85,247,.3); }
+    body.stage-916 #bottom-controls, body.stage-916 #obs-hint { display:none !important; }
+    body.stage-916 #btn-music, body.stage-916 #btn-conn-modal, body.stage-916 #btn-toggle-obs { display:none !important; }
+    body.stage-916 #top-header { flex-wrap:wrap; }
+    body.stage-916 #top-header > div:nth-child(2) { flex:1 1 100%; max-width:none; order:3; margin:0.25rem 0 0; }
+    #stage-sound-btn { display:none; }
+    body.stage-916 #stage-sound-btn { display:flex; }
   </style>
 </head>
 <body class="h-screen w-screen flex flex-col bg-[#070814] select-none">
@@ -156,6 +169,9 @@
       <div id="obs-hint" class="absolute bottom-2 left-3 z-20 pointer-events-none text-[11px] text-slate-400/80 bg-slate-950/70 px-2 py-0.5 rounded border border-slate-800">
         💡 Mẹo: Nhấn phím <span class="text-cyan-400 font-bold">H</span> hoặc nút <span class="text-pink-400 font-bold">🎬 OBS</span> để ẩn/hiện thanh công cụ khi live stream!
       </div>
+
+      <!-- STAGE 9:16: nút bật tiếng (trình duyệt chặn autoplay, cần 1 chạm) -->
+      <button id="stage-sound-btn" class="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 px-4 py-2 rounded-full bg-pink-600 hover:bg-pink-500 text-white text-sm font-bold shadow-[0_0_20px_rgba(244,63,94,0.6)] items-center gap-2">🔊 Chạm để bật tiếng game</button>
     </div>
 
     <!-- RIGHT SIDEBAR: LEADERBOARD & LIVE CHAT FEED (COLLAPSIBLE) -->
@@ -375,6 +391,9 @@ node server.js username_cua_ban</pre>
       wsConnected: false,
       tiktokUsername: '',
     };
+
+    // Stage 9:16: trang /stage chạy khung dọc, chỉ nghe WS (panel điều khiển kết nối)
+    const IS_STAGE = window.location.pathname === '/stage' || new URLSearchParams(window.location.search).get('view') === 'stage';
 
     // Realistic human skin, hair & clubwear palettes
     const PALETTES = [
@@ -2580,6 +2599,38 @@ node server.js username_cua_ban</pre>
       }
     }
 
+    // --- Stage 9:16: chỉ nghe WS, không subscribe (panel điều khiển kết nối) ---
+    function connectStageListenWS() {
+      const wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
+      try {
+        const socket = new WebSocket(wsUrl);
+        STATE.ws = socket;
+        socket.onopen = () => updateConnStatus('connected', 'Đang nghe LIVE');
+        socket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.type === 'status') {
+              if (data.mode === 'live') {
+                if (STATE.isAutoDemo) { STATE.isAutoDemo = false; const b = document.getElementById('auto-btn-text'); if (b) b.innerText = 'Tự Động Quẩy: TẮT'; }
+                updateConnStatus('connected', '@' + (data.username || '') + ' (Live)');
+              } else {
+                if (!STATE.isAutoDemo) { STATE.isAutoDemo = true; const b = document.getElementById('auto-btn-text'); if (b) b.innerText = 'Tự Động Quẩy: BẬT'; runAutoSimulationTick(); }
+                updateConnStatus('demo', 'Demo Mode');
+              }
+              if (data.soundOn) { initAudio(); STATE.audioMuted = false; const sb = document.getElementById('stage-sound-btn'); if (sb) sb.style.display = 'none'; }
+              return;
+            }
+            if (data.type === 'soundOn') { initAudio(); STATE.audioMuted = false; const sb = document.getElementById('stage-sound-btn'); if (sb) sb.style.display = 'none'; return; }
+            if (data.type === 'soundOff') { STATE.audioMuted = true; return; }
+            if (data.type === 'error') return;
+            handleIncomingLiveEvent(data);
+          } catch (err) { console.error('Lỗi phân tích WebSocket message:', err); }
+        };
+        socket.onclose = () => { updateConnStatus('demo', 'Demo Mode'); setTimeout(connectStageListenWS, 5000); };
+        socket.onerror = () => {};
+      } catch (e) {}
+    }
+
     function handleIncomingLiveEvent(event) {
       // Handles standardized events forwarded by the Node.js TikTokLiveConnector bridge
       if (event.type === 'chat') {
@@ -2862,6 +2913,19 @@ node server.js username_cua_ban</pre>
 
       // Start Auto Simulation loop
       runAutoSimulationTick();
+
+      // Chế độ stage 9:16 (/stage): khung dọc, ẩn toolbar, tự nghe WS live
+      if (IS_STAGE) {
+        document.body.classList.add('stage-916');
+        const sndBtn = document.getElementById('stage-sound-btn');
+        if (sndBtn) sndBtn.addEventListener('click', () => {
+          initAudio();
+          if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+          STATE.audioMuted = false;
+          sndBtn.style.display = 'none';
+        });
+        connectStageListenWS();
+      }
 
       // Start Canvas Render Loop
       requestAnimationFrame(renderLoop);

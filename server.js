@@ -16,6 +16,7 @@
 const express = require('express');
 const { createServer } = require('node:http');
 const { WebSocketServer } = require('ws');
+const { createHash } = require('node:crypto');
 const path = require('node:path');
 
 const PORT = Number(process.env.PORT || 4193);
@@ -34,19 +35,31 @@ app.use((req, res, next) => {
 
 function isAuthed(req) {
   if (!PANEL_KEY) return true;
+  const m = String(req.headers.cookie || '').match(/(?:^|;\s*)panel_auth=([a-f0-9]{64})/);
   const h = req.headers['x-panel-key'] || '';
   const b = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
-  return h === PANEL_KEY || b === PANEL_KEY;
+  return (Boolean(m) && m[1] === createHash('sha256').update('panel:' + PANEL_KEY).digest('hex')) || h === PANEL_KEY || b === PANEL_KEY;
 }
 function requireAuth(req, res, next) {
   if (isAuthed(req)) return next();
   return res.status(403).json({ ok: false, error: 'Sai mật khẩu panel' });
 }
 
+// Đăng nhập panel: đúng PANEL_KEY thì đặt cookie 30 ngày.
+app.post('/api/login', (req, res) => {
+  const key = String(req.body?.key || '');
+  if (!PANEL_KEY) return res.json({ ok: true });
+  if (!key || key !== PANEL_KEY) return res.status(403).json({ ok: false, error: 'Sai mật khẩu' });
+  const token = createHash('sha256').update('panel:' + key).digest('hex');
+  res.setHeader('Set-Cookie', `panel_auth=${token}; Path=/; Max-Age=${30 * 24 * 3600}; HttpOnly; SameSite=Lax`);
+  return res.json({ ok: true });
+});
+app.get('/api/me', (req, res) => res.json({ ok: true, authed: isAuthed(req), needsSetup: !PANEL_KEY }));
+
 const state = {
   mode: 'idle', username: '', roomId: '', viewers: 0,
   totalLikes: 0, totalGifts: 0, totalCoins: 0, lastError: '', botOn: false,
-  game: 'cyber-bar',
+  game: 'cyber-bar', soundOn: false,
 };
 
 const httpServer = createServer(app);
@@ -167,11 +180,23 @@ wss.on('connection', (ws) => {
   });
 });
 
-// --- Trang game tĩnh (landscape; /stage cùng 1 trang) ---
-app.use(express.static(path.join(__dirname, 'public')));
+// Điều khiển stage từ panel: bật/tắt tiếng (gửi tới mọi stage đang mở qua WS).
+app.post('/api/control', requireAuth, (req, res) => {
+  const action = req.body?.action;
+  if (action === 'soundOn') { state.soundOn = true; broadcast({ type: 'soundOn' }); }
+  else if (action === 'soundOff') { state.soundOn = false; broadcast({ type: 'soundOff' }); }
+  else return res.status(400).json({ ok: false, error: 'action phải là soundOn/soundOff' });
+  broadcastStatus();
+  res.json({ ok: true, ...state });
+});
+
+// --- Trang game tĩnh: / là panel điều khiển, /stage là sàn dọc 9:16 ---
+// (Đăng ký trước express.static để / không bị index.html của game chiếm.)
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'panel.html')));
 app.get('/stage', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/game', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 httpServer.listen(PORT, '0.0.0.0', () => {
-  console.log(`Cyber Bar LIVE trên cổng ${PORT} — trang game ở / , stage ở /stage, WS ở /ws`);
+  console.log(`Cyber Bar LIVE trên cổng ${PORT} — panel ở / , stage 9:16 ở /stage, WS ở /ws`);
 });

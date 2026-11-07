@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Bar — Trang Điều Khiển</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #070714; color: #e2e8f0; }
+    .font-gaming { font-family: 'Orbitron', monospace, sans-serif; }
+    .card { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 0.75rem; padding: 1rem; }
+    .btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 700; font-size: 0.875rem; transition: all 0.15s; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-pink { background: linear-gradient(to right, #db2777, #9333ea); color: #fff; }
+    .btn-pink:hover:not(:disabled) { filter: brightness(1.15); }
+    .btn-dark { background: #1e293b; border: 1px solid #475569; color: #e2e8f0; }
+    .btn-dark:hover:not(:disabled) { background: #334155; }
+    .btn-cyan { background: #0e7490; color: #fff; }
+    .btn-cyan:hover:not(:disabled) { background: #0891b2; }
+    .input { background: #020617; border: 1px solid #334155; border-radius: 0.5rem; padding: 0.5rem 0.75rem; color: #fff; font-size: 0.875rem; outline: none; width: 100%; }
+    .input:focus { border-color: #22d3ee; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div class="max-w-3xl mx-auto px-3 py-5 flex flex-col gap-4">
+
+    <header class="flex items-center justify-between gap-3">
+      <div>
+        <h1 class="font-gaming font-black text-xl sm:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-400 to-cyan-400 tracking-wider">🎧 CYBER BAR</h1>
+        <p class="text-slate-400 text-xs sm:text-sm">Trang điều khiển — TikTok LIVE Dance Club (khung dọc 9:16)</p>
+      </div>
+      <a href="/stage" target="_blank" class="btn btn-pink whitespace-nowrap">🎬 Mở Stage</a>
+    </header>
+
+    <!-- Đăng nhập panel -->
+    <section class="card" id="login-card">
+      <h2 class="font-bold text-pink-300 mb-2">🔐 Mật khẩu panel</h2>
+      <div class="flex gap-2">
+        <input id="input-panel-key" type="password" placeholder="Nhập mật khẩu panel…" class="input">
+        <button id="btn-login" class="btn btn-pink whitespace-nowrap">Đăng nhập</button>
+      </div>
+      <p id="login-status" class="text-xs text-slate-400 mt-2">Chưa đăng nhập — chỉ xem trạng thái, chưa bấm được nút điều khiển.</p>
+    </section>
+
+    <!-- Trạng thái live -->
+    <section class="card">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="font-bold text-cyan-300">📡 Trạng thái live</h2>
+        <span id="mode-badge" class="px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-600 text-xs font-bold text-slate-300">IDLE</span>
+      </div>
+      <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center text-xs">
+        <div><div class="text-slate-400">Kênh</div><div id="st-username" class="font-bold text-white truncate">—</div></div>
+        <div><div class="text-slate-400">Đang xem</div><div id="st-viewers" class="font-gaming font-bold text-cyan-300">0</div></div>
+        <div><div class="text-slate-400">Thả tim</div><div id="st-likes" class="font-gaming font-bold text-rose-400">0</div></div>
+        <div><div class="text-slate-400">Quà</div><div id="st-gifts" class="font-gaming font-bold text-yellow-300">0</div></div>
+        <div><div class="text-slate-400">Tổng xu</div><div id="st-coins" class="font-gaming font-bold text-amber-300">0</div></div>
+        <div><div class="text-slate-400">Tiếng stage</div><div id="st-sound" class="font-bold text-purple-300">TẮT</div></div>
+      </div>
+      <p id="st-error" class="text-xs text-rose-400 mt-2 hidden"></p>
+    </section>
+
+    <!-- Kết nối TikTok -->
+    <section class="card">
+      <h2 class="font-bold text-pink-300 mb-2">🔗 Kết nối TikTok LIVE</h2>
+      <div class="flex gap-2">
+        <span class="inline-flex items-center px-2 bg-slate-800 text-slate-400 rounded font-mono">@</span>
+        <input id="input-username" type="text" placeholder="vd: thuylinh012345" class="input">
+        <button id="btn-connect" class="btn btn-cyan whitespace-nowrap" disabled>Kết Nối</button>
+        <button id="btn-disconnect" class="btn btn-dark whitespace-nowrap" disabled>Ngắt</button>
+      </div>
+      <p id="conn-status" class="text-xs text-slate-400 mt-2">Chưa kết nối — stage đang chạy Demo (bot giả lập).</p>
+    </section>
+
+    <!-- Âm thanh stage -->
+    <section class="card">
+      <h2 class="font-bold text-purple-300 mb-2">🔊 Âm thanh stage</h2>
+      <div class="flex gap-2 flex-wrap">
+        <button id="btn-sound-on" class="btn btn-pink" disabled>Bật tiếng stage</button>
+        <button id="btn-sound-off" class="btn btn-dark" disabled>Tắt tiếng stage</button>
+      </div>
+      <p class="text-xs text-slate-400 mt-2">Bật tiếng gửi lệnh tới stage đang mở (OBS / trình duyệt) ngay, không cần tải lại. Nếu stage mở trên trình duyệt thường mà vẫn im, bấm nút “Chạm để bật tiếng game” trên stage 1 lần.</p>
+    </section>
+
+    <!-- Thử hiệu ứng -->
+    <section class="card">
+      <h2 class="font-bold text-yellow-300 mb-2">🧪 Thử hiệu ứng trên stage</h2>
+      <div class="flex flex-col gap-2">
+        <div class="flex gap-2">
+          <input id="input-test-chat" type="text" placeholder="Nhập bình luận thử (vd: nhay, 123zo)…" class="input">
+          <button id="btn-test-chat" class="btn btn-dark whitespace-nowrap" disabled>Gửi Chat</button>
+        </div>
+        <div class="flex gap-2 flex-wrap items-center">
+          <select id="select-test-gift" class="input" style="width:auto">
+            <option value="rose">🌹 Hoa Hồng (10)</option>
+            <option value="heart">💖 Bắn Tim (50)</option>
+            <option value="cap">🧢 Kính &amp; Mũ (99)</option>
+            <option value="champagne">🍾 Sâm Panh (299)</option>
+            <option value="fireworks">🎆 Pháo Hoa (1088)</option>
+            <option value="galaxy">🌌 Vũ Trụ (1000)</option>
+            <option value="lion">🦁 Sư Tử Vàng (29999)</option>
+          </select>
+          <button id="btn-test-gift" class="btn btn-dark whitespace-nowrap" disabled>Tặng Quà Thử</button>
+          <button id="btn-test-like" class="btn btn-dark whitespace-nowrap" disabled>❤️ +50 Like Thử</button>
+        </div>
+      </div>
+      <p id="test-status" class="text-xs text-slate-400 mt-2"></p>
+    </section>
+
+    <!-- Stage cho OBS -->
+    <section class="card">
+      <h2 class="font-bold text-cyan-300 mb-2">🎬 Stage cho OBS / TikTok LIVE Studio</h2>
+      <div class="flex gap-2">
+        <input id="stage-url" type="text" readonly value="" class="input font-mono">
+        <button id="btn-copy-stage" class="btn btn-dark whitespace-nowrap">Sao chép</button>
+      </div>
+      <p class="text-xs text-slate-400 mt-2">Nguồn trình duyệt (Browser Source): <b class="text-slate-200">540 × 960</b>, khung dọc 9:16. Mở stage là thấy sàn nhảy + BXH/chat bên dưới.</p>
+    </section>
+
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let panelKey = sessionStorage.getItem('cyberbar-panel-key') || '';
+    let authed = false;
+
+    function headers() {
+      const h = { 'Content-Type': 'application/json' };
+      if (panelKey) h['x-panel-key'] = panelKey;
+      return h;
+    }
+    async function api(path, opts = {}) {
+      const res = await fetch(path, { ...opts, headers: headers() });
+      const data = await res.json().catch(() => ({}));
+      return { ok: res.ok, status: res.status, data };
+    }
+    function setAuthed(v, msg) {
+      authed = v;
+      ['btn-connect', 'btn-disconnect', 'btn-sound-on', 'btn-sound-off', 'btn-test-chat', 'btn-test-gift', 'btn-test-like'].forEach(id => { $(id).disabled = !v; });
+      $('login-status').innerText = msg || (v ? 'Đã đăng nhập — dùng được hết nút điều khiển.' : 'Chưa đăng nhập — chỉ xem trạng thái, chưa bấm được nút điều khiển.');
+      $('login-status').className = 'text-xs mt-2 ' + (v ? 'text-emerald-400' : 'text-slate-400');
+    }
+    async function refreshStatus() {
+      try {
+        const r = await fetch('/api/status');
+        const s = await r.json();
+        $('st-username').innerText = s.username ? '@' + s.username : '—';
+        $('st-viewers').innerText = (s.viewers || 0).toLocaleString();
+        $('st-likes').innerText = (s.totalLikes || 0).toLocaleString();
+        $('st-gifts').innerText = (s.totalGifts || 0).toLocaleString();
+        $('st-coins').innerText = (s.totalCoins || 0).toLocaleString();
+        $('st-sound').innerText = s.soundOn ? 'BẬT' : 'TẮT';
+        const badge = $('mode-badge');
+        if (s.mode === 'live') { badge.innerText = '● LIVE'; badge.className = 'px-2.5 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/50 text-xs font-bold text-rose-400'; }
+        else { badge.innerText = 'IDLE'; badge.className = 'px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-600 text-xs font-bold text-slate-300'; }
+        $('conn-status').innerText = s.mode === 'live' ? ('Đang live @' + s.username + ' — chat/quà thật đang chạy vào stage.') : 'Chưa kết nối — stage đang chạy Demo (bot giả lập).';
+        const err = $('st-error');
+        if (s.lastError) { err.innerText = 'Lỗi kết nối: ' + s.lastError; err.classList.remove('hidden'); }
+        else err.classList.add('hidden');
+      } catch (e) {}
+    }
+
+    $('btn-login').addEventListener('click', async () => {
+      const key = $('input-panel-key').value.trim();
+      if (!key) { $('login-status').innerText = 'Nhập mật khẩu panel trước đã ạ.'; return; }
+      const r = await api('/api/login', { method: 'POST', body: JSON.stringify({ key }) });
+      if (r.ok && r.data.ok) { panelKey = key; sessionStorage.setItem('cyberbar-panel-key', key); setAuthed(true, 'Đã đăng nhập — dùng được hết nút điều khiển.'); $('input-panel-key').value = ''; }
+      else setAuthed(false, 'Sai mật khẩu panel — thử lại giúp đệ.');
+    });
+    $('input-panel-key').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('btn-login').click(); });
+
+    $('btn-connect').addEventListener('click', async () => {
+      const username = $('input-username').value.trim().replace(/^@/, '');
+      if (!username) { $('conn-status').innerText = 'Nhập username TikTok trước đã ạ.'; return; }
+      $('conn-status').innerText = 'Đang kết nối @' + username + '…';
+      const r = await api('/api/tiktok/connect', { method: 'POST', body: JSON.stringify({ username }) });
+      $('conn-status').innerText = r.ok ? ('Đã kết nối @' + username + ' — live thật đang chạy!') : ('Không kết nối được: ' + (r.data.error || 'lỗi không rõ'));
+      refreshStatus();
+    });
+    $('btn-disconnect').addEventListener('click', async () => {
+      await api('/api/tiktok/disconnect', { method: 'POST', body: '{}' });
+      $('conn-status').innerText = 'Đã ngắt kết nối — stage về Demo.';
+      refreshStatus();
+    });
+    $('btn-sound-on').addEventListener('click', async () => {
+      const r = await api('/api/control', { method: 'POST', body: JSON.stringify({ action: 'soundOn' }) });
+      $('st-sound').innerText = r.ok ? 'BẬT' : 'TẮT';
+      refreshStatus();
+    });
+    $('btn-sound-off').addEventListener('click', async () => {
+      await api('/api/control', { method: 'POST', body: JSON.stringify({ action: 'soundOff' }) });
+      refreshStatus();
+    });
+    $('btn-test-chat').addEventListener('click', async () => {
+      const comment = $('input-test-chat').value.trim() || 'nhay';
+      const r = await api('/api/test/emit', { method: 'POST', body: JSON.stringify({ type: 'chat', data: { nickname: 'Test', comment } }) });
+      $('test-status').innerText = r.ok ? 'Đã gửi chat thử: ' + comment : ('Gửi lỗi: ' + (r.data.error || ''));
+    });
+    $('btn-test-gift').addEventListener('click', async () => {
+      const giftName = $('select-test-gift').value;
+      const r = await api('/api/test/emit', { method: 'POST', body: JSON.stringify({ type: 'gift', data: { nickname: 'Test', giftName, repeatCount: 1 } }) });
+      $('test-status').innerText = r.ok ? 'Đã tặng quà thử: ' + giftName : ('Gửi lỗi: ' + (r.data.error || ''));
+    });
+    $('btn-test-like').addEventListener('click', async () => {
+      const r = await api('/api/test/emit', { method: 'POST', body: JSON.stringify({ type: 'like', data: { nickname: 'Test', likeCount: 50 } }) });
+      $('test-status').innerText = r.ok ? 'Đã gửi +50 like thử.' : ('Gửi lỗi: ' + (r.data.error || ''));
+    });
+    $('btn-copy-stage').addEventListener('click', () => {
+      const el = $('stage-url');
+      el.select();
+      if (navigator.clipboard) navigator.clipboard.writeText(el.value);
+      else document.execCommand('copy');
+      $('btn-copy-stage').innerText = 'Đã sao chép!';
+      setTimeout(() => { $('btn-copy-stage').innerText = 'Sao chép'; }, 2000);
+    });
+
+    (async () => {
+      $('stage-url').value = location.origin + '/stage';
+      if (panelKey) $('input-panel-key').value = panelKey;
+      try {
+        const r = await fetch('/api/me');
+        const me = await r.json();
+        if (me.authed) setAuthed(true);
+        else if (panelKey) {
+          const login = await api('/api/login', { method: 'POST', body: JSON.stringify({ key: panelKey }) });
+          if (login.ok && login.data.ok) setAuthed(true);
+        }
+      } catch (e) {}
+      refreshStatus();
+      setInterval(refreshStatus, 2000);
+    })();
+  </script>
+</body>
+</html>
