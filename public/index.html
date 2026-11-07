@@ -1337,13 +1337,14 @@ node server.js username_cua_ban</pre>
       ctx.lineWidth = 2;
       ctx.strokeRect(stageX + 15, tableY, stageW - 30, tableH);
 
-      // DJ Booth Neon Sign
-      ctx.font = 'bold 12px "Orbitron", sans-serif';
+      // DJ Booth Neon Sign (né đĩa than + panel quà bên phải: dời lên khoảng
+      // trống giữa đầu DJ và mặt bàn, căn giữa vùng trống bên trái panel)
+      ctx.font = 'bold 9px "Orbitron", sans-serif';
       ctx.fillStyle = '#f43f5e';
       ctx.textAlign = 'center';
       ctx.shadowColor = '#f43f5e';
       ctx.shadowBlur = 10;
-      ctx.fillText('DJ MASTER BEAT 🎛️', djCenterX, tableY + 22);
+      ctx.fillText('DJ MASTER BEAT 🎛️', stageX + 65, tableY - 8);
 
       // Vinyl turntables on the table
       ctx.fillStyle = '#020617';
@@ -2248,6 +2249,19 @@ node server.js username_cua_ban</pre>
 
       const alpha = Math.sin(progress * Math.PI); // Fade in & out
 
+      // Stage 9:16: panel quà 240px bên phải che mất chữ banner — thu banner
+      // vào vùng trống bên trái panel (x 8 → panel), căn giữa vùng đó; bản ngang giữ nguyên.
+      const bannerMaxW = IS_STAGE ? cw - 256 : cw;
+      const bannerCX = IS_STAGE ? 8 + bannerMaxW / 2 : cw * 0.5;
+      function drawBannerText(text, y, px, weight) {
+        let size = px;
+        fxCtx.font = `${weight} ${size}px "Orbitron", sans-serif`;
+        const w = fxCtx.measureText(text).width;
+        if (w > bannerMaxW) size = Math.max(10, Math.floor(size * bannerMaxW / w));
+        fxCtx.font = `${weight} ${size}px "Orbitron", sans-serif`;
+        fxCtx.fillText(text, bannerCX, y);
+      }
+
       if (specialFX.type === 'galaxy') {
         // Cosmic spiral galaxy effect
         fxCtx.save();
@@ -2268,12 +2282,11 @@ node server.js username_cua_ban</pre>
         }
 
         // Title banner
-        fxCtx.font = '900 24px "Orbitron", sans-serif';
         fxCtx.fillStyle = '#fdf4ff';
         fxCtx.textAlign = 'center';
         fxCtx.shadowColor = '#c084fc';
         fxCtx.shadowBlur = 20;
-        fxCtx.fillText(`🌌 VŨ TRỤ HUYỀN ẢO: ${specialFX.gifterName}`, centerX, ch * 0.28);
+        drawBannerText(`🌌 VŨ TRỤ HUYỀN ẢO: ${specialFX.gifterName}`, ch * 0.28, 24, 900);
         fxCtx.restore();
 
       } else if (specialFX.type === 'lion') {
@@ -2301,14 +2314,12 @@ node server.js username_cua_ban</pre>
         fxCtx.fillText('🦁', centerX, centerY);
 
         // Banner
-        fxCtx.font = '900 26px "Orbitron", sans-serif';
         fxCtx.fillStyle = '#fef08a';
         fxCtx.shadowColor = '#eab308';
         fxCtx.shadowBlur = 25;
-        fxCtx.fillText(`👑 VUA SÀN NHẢY: ${specialFX.gifterName}`, centerX, ch * 0.22);
-        fxCtx.font = 'bold 16px "Orbitron", sans-serif';
+        drawBannerText(`👑 VUA SÀN NHẢY: ${specialFX.gifterName}`, ch * 0.22, 26, 900);
         fxCtx.fillStyle = '#fde047';
-        fxCtx.fillText('THẦN THÚ SƯ TỬ VÀNG ĐÃ XUẤT HIỆN!', centerX, ch * 0.27);
+        drawBannerText('THẦN THÚ SƯ TỬ VÀNG ĐÃ XUẤT HIỆN!', ch * 0.27, 16, 'bold');
         fxCtx.restore();
 
       } else if (specialFX.type === 'champagne') {
@@ -2322,11 +2333,10 @@ node server.js username_cua_ban</pre>
         fxCtx.textAlign = 'center';
         fxCtx.fillText('🍾', centerX, centerY);
 
-        fxCtx.font = 'bold 20px "Orbitron", sans-serif';
         fxCtx.fillStyle = '#fde047';
         fxCtx.shadowColor = '#eab308';
         fxCtx.shadowBlur = 15;
-        fxCtx.fillText(`🥂 ${specialFX.gifterName} KHUI SÂM PANH TOÀN SÀN!`, centerX, centerY - 60);
+        drawBannerText(`🥂 ${specialFX.gifterName} KHUI SÂM PANH TOÀN SÀN!`, centerY - 60, 20, 'bold');
         fxCtx.restore();
       }
     }
