@@ -73,6 +73,7 @@
     body.stage-916 > main { min-height:0; }
     body.stage-916 #sidebar-panel { min-height:0; }
     body.stage-916 #tab-leaderboard, body.stage-916 #tab-chat { min-height:0; }
+    body.stage-916 #tab-leaderboard-btn { display:none !important; }
     body.stage-916 #bottom-controls, body.stage-916 #obs-hint { display:none !important; }
     body.stage-916 #btn-music, body.stage-916 #btn-conn-modal, body.stage-916 #btn-toggle-obs { display:none !important; }
     body.stage-916 #top-header { flex-wrap:wrap; }
@@ -160,6 +161,18 @@
           <div id="spotlight-dance-style" class="mt-1 inline-block px-2 py-0.5 rounded bg-cyan-950/90 border border-cyan-400/40 font-gaming text-[10px] text-cyan-300">
             🕺 Vũ đạo: Melbourne Shuffle
           </div>
+        </div>
+      </div>
+
+      <!-- BANG DAI GIA + QUA TANG: list doc giua-phia tren -->
+      <div id="top-boards" class="absolute top-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-[min(68%,280px)] flex flex-col gap-1.5">
+        <div class="rounded-xl bg-slate-950/80 border border-yellow-500/40 backdrop-blur-md px-2 py-1 shadow-lg">
+          <div class="text-center font-gaming font-black text-[11px] tracking-wider text-yellow-300">🏆 BXH ĐẠI GIA</div>
+          <div id="top-dai-gia-list" class="flex flex-col gap-px mt-0.5"></div>
+        </div>
+        <div class="rounded-xl bg-slate-950/80 border border-pink-500/40 backdrop-blur-md px-2 py-1 shadow-lg">
+          <div class="text-center font-gaming font-black text-[11px] tracking-wider text-pink-300">🎁 QUÀ TẶNG</div>
+          <div id="top-gift-list" class="flex flex-col gap-px mt-0.5"></div>
         </div>
       </div>
 
@@ -396,6 +409,7 @@ node server.js username_cua_ban</pre>
       audioMuted: false,
       voiceOn: true,
       activeTab: 'leaderboard',
+      recentGifts: [],
       ws: null,
       wsConnected: false,
       tiktokUsername: '',
@@ -2378,6 +2392,9 @@ node server.js username_cua_ban</pre>
       dancer.applyGift(giftType, totalCoins);
       // Tang qua: nhay nhanh + manh hon trong 6 giay (kem spotlight von co)
       dancer.boostUntil = Date.now() + 6000;
+      // Luu qua moi nhat de hien trong bang qua tang (giu 5 qua gan nhat)
+      STATE.recentGifts.unshift({ nickname: dancer.nickname || nickname || username, giftName: info.name, coins: totalCoins });
+      if (STATE.recentGifts.length > 5) STATE.recentGifts.length = 5;
 
       // Trigger Camera Spotlight Zoom & Solo Dance Routine!
       triggerCameraSpotlight(dancer, info.name, totalCoins);
@@ -2630,6 +2647,23 @@ node server.js username_cua_ban</pre>
         `;
         list.appendChild(item);
       });
+
+      // Bang giua-phia tren: top 5 dai gia + 5 qua moi nhat
+      const topBoard = document.getElementById('top-dai-gia-list');
+      if (topBoard) {
+        topBoard.innerHTML = dancers.length === 0
+          ? `<div class="text-slate-500 text-center py-1 text-[11px]">Chưa có đại gia...</div>`
+          : dancers.slice(0, 5).map((d, i) => {
+              const medal = i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+              return `<div class="flex items-center justify-between px-1 py-px text-[11px]"><span class="flex items-center gap-1 truncate"><span class="w-4 text-center">${medal}</span><span class="font-bold ${i === 0 ? 'text-yellow-300' : 'text-slate-200'} truncate">${d.nickname}</span></span><span class="font-gaming font-bold ${i === 0 ? 'text-yellow-400' : 'text-pink-400'}">${d.totalCoins.toLocaleString()} Xu</span></div>`;
+            }).join('');
+      }
+      const giftBoard = document.getElementById('top-gift-list');
+      if (giftBoard) {
+        giftBoard.innerHTML = STATE.recentGifts.length === 0
+          ? `<div class="text-slate-500 text-center py-1 text-[11px]">Chưa có quà tặng...</div>`
+          : STATE.recentGifts.map(g => `<div class="flex items-center justify-between gap-1 px-1 py-px text-[11px]"><span class="font-bold text-slate-200 truncate">${g.nickname}</span><span class="truncate text-pink-300">${g.giftName}</span><span class="font-gaming font-bold text-yellow-400 whitespace-nowrap">+${g.coins.toLocaleString()} Xu</span></div>`).join('');
+      }
     }
 
     // --- Automated Realistic Simulation Engine (Auto Demo Mode) ---
@@ -2962,6 +2996,9 @@ node server.js username_cua_ban</pre>
         tabChatBtn.className = 'flex-1 py-2 font-bold text-center border-b-2 border-cyan-500 text-cyan-400 flex items-center justify-center gap-1.5 transition';
         tabLeadBtn.className = 'flex-1 py-2 font-bold text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition';
       });
+
+      // Stage 9:16: bang dai gia da chuyen len giua-phia tren nen sidebar chi hien chat
+      if (IS_STAGE) tabChatBtn.click();
 
       // Connection Modal Open / Close
       const modal = document.getElementById('conn-modal');

@@ -205,6 +205,18 @@ cổng **4193**, không chạm tới Sàn Vui cũ ở sanvui.bla.io.vn.
   làm mờ nền, chùm sáng + HUD tên người tặng + tên quà, 4.5–8s theo
   giá trị quà); giờ càng rõ vì điệu nhảy thường đã nhẹ lại.
 
+## Bảng đại gia + quà tặng giữa-phía trên (2026-11-07 tối)
+
+- Bảng BXH ĐẠI GIA chuyển khỏi tab sidebar thành overlay `#top-boards`
+  giữa-phía trên canvas (`top-2`, giữa ngang, rộng tối đa 280px, 2 mục
+  xếp dọc): **🏆 BXH ĐẠI GIA** (top 5 theo tổng Xu, 👑🥈🥉 top 3) +
+  **🎁 QUÀ TẶNG** (5 quà mới nhất: tên người tặng + tên quà + Xu).
+  Quà mới ghi vào `STATE.recentGifts` trong `handleTikTokGift`, vẽ
+  trong `updateLeaderboard()` (gọi khi có quà + lúc tải trang).
+- Stage 9:16: nút tab BXH ở sidebar bị ẩn (CSS), sidebar mặc định mở
+  tab LIVE CHAT (`if (IS_STAGE) tabChatBtn.click()`). Bản ngang (panel)
+  vẫn giữ cả 2 tab sidebar như cũ.
+
 ## Checklist áp dụng cho bản demo HTML sau này (đại ca dặn 2026-11-07)
 
 Khi đại ca đưa bản demo mới bằng file HTML, bổ sung đủ các chức năng này
