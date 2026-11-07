@@ -173,6 +173,12 @@ cổng **4193**, không chạm tới Sàn Vui cũ ở sanvui.bla.io.vn.
   ứng viên có khoảng cách tới vũ công gần nhất lớn nhất); bảng tên va
   chạm thì dồn lên trên tối đa 3 nấc (`drawnNameTags` theo khung hình).
   Vũ công solo spotlight vẫn về giữa sàn như cũ.
+- Sửa key sprite lệch (2026-11-07 tối): 2/8 vũ công demo (Tiên DJ,
+  Đại Gia Rồng) hiện nhân vật vẽ tay thay vì ảnh 3D vì key trong
+  `dancer-sprites.js` (`tien_dj`, `dai_gia_rong`) không khớp username
+  trong game (`thuy_tien_dj`, `dragon_master`) — lookup
+  `DANCER_SPRITES[dancer.username]` trả rỗng nên rơi về bộ xương code.
+  Đã đổi tên 2 key cho khớp username; giờ 8/8 key = 8/8 username.
 
 ## Checklist áp dụng cho bản demo HTML sau này (đại ca dặn 2026-11-07)
 
