@@ -704,6 +704,30 @@ node server.js username_cua_ban</pre>
     }
 
     // --- Dancer Model ---
+    // Chọn vị trí mới sao cho xa các vũ công khác nhất (dàn đều, khỏi dồn cụm).
+    // Không tham số: lấy mẫu cả sàn (lúc xuất hiện). Có cx/cy/rx/ry: lấy mẫu
+    // quanh vị trí hiện tại (lúc đi lang thang). `except` để loại chính mình.
+    function pickSpreadPosition(cx, cy, rx, ry, except) {
+      const others = Array.from(STATE.dancers.values());
+      let best = null, bestScore = -1;
+      for (let i = 0; i < 10; i++) {
+        let x, y;
+        if (cx === undefined) { x = 0.14 + Math.random() * 0.72; y = 0.36 + Math.random() * 0.52; }
+        else {
+          x = Math.max(0.12, Math.min(0.88, cx + (Math.random() - 0.5) * 2 * rx));
+          y = Math.max(0.32, Math.min(0.88, cy + (Math.random() - 0.5) * 2 * ry));
+        }
+        let minD = 10;
+        others.forEach(o => {
+          if (o === except) return;
+          const d = Math.hypot((o.targetGridX - x) * 1.4, o.targetGridY - y);
+          if (d < minD) minD = d;
+        });
+        if (minD > bestScore) { bestScore = minD; best = { x, y }; }
+      }
+      return best || { x: 0.5, y: 0.6 };
+    }
+
     class Dancer {
       constructor(username, nickname = '') {
         this.username = username;
@@ -712,8 +736,10 @@ node server.js username_cua_ban</pre>
         this.palette = PALETTES[Math.floor(Math.random() * PALETTES.length)];
         
         // Position on 2.5D floor
-        this.gridX = 0.2 + Math.random() * 0.6; // normalized 0..1
-        this.gridY = 0.35 + Math.random() * 0.55; // depth
+        // Xuất hiện ở vị trí dàn đều, xa các vũ công khác nhất
+        const spawn = pickSpreadPosition();
+        this.gridX = spawn.x;
+        this.gridY = spawn.y;
         this.targetGridX = this.gridX;
         this.targetGridY = this.gridY;
 
@@ -864,10 +890,11 @@ node server.js username_cua_ban</pre>
           }
         }
 
-        // Random wander occasionally
+        // Đi lang thang nhưng chọn chỗ gần mình mà xa các vũ công khác nhất
         if (Math.random() < 0.003 && this.action !== 'drink') {
-          this.targetGridX = Math.max(0.12, Math.min(0.88, this.gridX + (Math.random() - 0.5) * 0.25));
-          this.targetGridY = Math.max(0.32, Math.min(0.88, this.gridY + (Math.random() - 0.5) * 0.2));
+          const spot = pickSpreadPosition(this.gridX, this.gridY, 0.125, 0.1, this);
+          this.targetGridX = spot.x;
+          this.targetGridY = spot.y;
         }
 
         // Check aura expiration
@@ -1070,6 +1097,7 @@ node server.js username_cua_ban</pre>
       }
 
       // 7. Sort & Render Dancers (Back to Front based on gridY)
+      drawnNameTags = [];
       const sortedDancers = Array.from(STATE.dancers.values()).sort((a, b) => a.gridY - b.gridY);
       sortedDancers.forEach(dancer => {
         if (isSpotlighting && dancer === CAMERA.activeDancer) {
@@ -1495,6 +1523,9 @@ node server.js username_cua_ban</pre>
       const perspScale = 0.65 + pRatio * 0.65;
       return { x: screenX, y: screenY, scale: perspScale * dancer.scale };
     }
+
+    // Bảng tên đã vẽ trong khung hình này (để dồn tag lên khi chồng nhau)
+    let drawnNameTags = [];
 
     // Sprite nhân vật 3D (ảnh AI nền xanh đã tách nền, nạp từ assets/dancer-sprites.js).
     // Vũ công nào có ảnh thì vẽ ảnh thay cho bộ xương code.
@@ -2009,12 +2040,22 @@ node server.js username_cua_ban</pre>
       } // hết if (!hasSprite) — vẽ bộ xương code
 
       // --- 6. FLOATING NAME TAG, DANCE ROUTINE BADGE & CHAT BUBBLE ---
-      const tagY = pelvisY - (dancer.hasCrown ? 66 * s : 56 * s);
+      let tagY = pelvisY - (dancer.hasCrown ? 66 * s : 56 * s);
       ctx.font = `bold ${Math.max(9, Math.floor(10 * s))}px "Plus Jakarta Sans", sans-serif`;
       ctx.textAlign = 'center';
 
       const nameText = dancer.nickname;
       const tagW = ctx.measureText(nameText).width + 14;
+      // Tránh bảng tên chồng nhau khi vũ công đứng gần nhau: dồn tag lên trên
+      let tagScreenX = pos.x + pelvisX;
+      let tagScreenY = pos.y + tagY;
+      for (let bump = 0; bump < 3; bump++) {
+        const hit = drawnNameTags.find(t => Math.abs(t.x - tagScreenX) < (t.w + tagW) / 2 + 4 && Math.abs(t.y - tagScreenY) < 16);
+        if (!hit) break;
+        tagY -= 16;
+        tagScreenY -= 16;
+      }
+      drawnNameTags.push({ x: tagScreenX, y: tagScreenY, w: tagW });
       ctx.fillStyle = isSolo ? 'rgba(131, 24, 67, 0.92)' : 'rgba(15, 23, 42, 0.85)';
       ctx.strokeStyle = (dancer.hasCrown || isSolo) ? '#fde047' : 'rgba(236, 72, 153, 0.45)';
       ctx.lineWidth = isSolo ? 1.8 : 1;
