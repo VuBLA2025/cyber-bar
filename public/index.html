@@ -1338,13 +1338,26 @@ node server.js username_cua_ban</pre>
       ctx.strokeRect(stageX + 15, tableY, stageW - 30, tableH);
 
       // DJ Booth Neon Sign (mặt trước bàn DJ: nền đặc, hết EQ + banner sư tử
-      // + đĩa than; căn giữa vùng trống bên trái panel quà)
-      ctx.font = 'bold 10px "Orbitron", sans-serif';
-      ctx.fillStyle = '#fb7185';
+      // + đĩa than; co chữ vừa vùng trống bên trái panel quà ở mọi khổ màn
+      // hình — khổ hẹp thì rút gọn chữ, khỏi bị panel cắt đuôi)
       ctx.textAlign = 'center';
+      const djSignZoneL = stageX + 15;
+      const djSignZoneR = cw - 248; // mép trái panel quà (rộng 240px + right-2)
+      const djSignCX = (djSignZoneL + djSignZoneR) / 2;
+      const djSignMaxW = djSignZoneR - djSignZoneL - 8;
+      let djSignText = 'DJ MASTER BEAT 🎛️';
+      let djSignPx = 10;
+      ctx.font = `bold ${djSignPx}px "Orbitron", sans-serif`;
+      if (ctx.measureText(djSignText).width > djSignMaxW) {
+        djSignPx = Math.max(8, Math.floor(djSignPx * djSignMaxW / ctx.measureText(djSignText).width));
+        ctx.font = `bold ${djSignPx}px "Orbitron", sans-serif`;
+      }
+      if (ctx.measureText(djSignText).width > djSignMaxW) djSignText = 'DJ MASTER 🎛️';
+      ctx.font = `bold ${djSignPx}px "Orbitron", sans-serif`;
+      ctx.fillStyle = '#fb7185';
       ctx.shadowColor = '#fb7185';
       ctx.shadowBlur = 12;
-      ctx.fillText('DJ MASTER BEAT 🎛️', stageX + 60, tableY + tableH - 12);
+      ctx.fillText(djSignText, djSignCX, tableY + tableH - 12);
 
       // Vinyl turntables on the table
       ctx.fillStyle = '#020617';
