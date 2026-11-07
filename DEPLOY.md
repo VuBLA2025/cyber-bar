@@ -188,6 +188,23 @@ cổng **4193**, không chạm tới Sàn Vui cũ ở sanvui.bla.io.vn.
   (đổi số version mỗi lần sửa file này). Bài học: asset lớn đổi nội
   dung thì phải đổi URL, không thì cache giữ bản cũ tới 4h.
 
+## Người xem bốc ảnh 3D + nhảy nhẹ / quà nhảy nhanh (2026-11-07 tối)
+
+- Người xem thật bốc ngẫu nhiên 1 trong 8 ảnh 3D (`Dancer.spriteKey`:
+  vũ công demo giữ đúng ảnh của mình, người xem thật bốc ngẫu nhiên
+  trong 8 key, giữ nguyên khi còn ở trên sàn; vẽ qua
+  `DANCER_SPRITES[dancer.spriteKey || dancer.username]`). Người xem
+  chỉ lên sàn khi chat/thả tim/tặng quà; tối đa 40 người trên sàn.
+- Nhảy nhẹ lúc bình thường: `speedMult` 1.0 → 0.6, biên độ lắc/nhún
+  ×0.7 (`moveScale`); Fever 1.5 giữ nguyên.
+- Tặng quà thì nhảy nhanh + mạnh hơn: `dancer.boostUntil = now + 6s`
+  (đặt trong `handleTikTokGift`), tốc độ solo 1.85 → 2.0, boost 1.9,
+  sprite to 1.15× khi solo/boost.
+- Camera tập trung vào nhân vật đang nhảy vốn đã có từ trước (khi tặng
+  quà: `triggerCameraSpotlight` zoom 2.25–2.55×, lia tới người tặng,
+  làm mờ nền, chùm sáng + HUD tên người tặng + tên quà, 4.5–8s theo
+  giá trị quà); giờ càng rõ vì điệu nhảy thường đã nhẹ lại.
+
 ## Checklist áp dụng cho bản demo HTML sau này (đại ca dặn 2026-11-07)
 
 Khi đại ca đưa bản demo mới bằng file HTML, bổ sung đủ các chức năng này

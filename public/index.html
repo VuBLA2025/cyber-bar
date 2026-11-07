@@ -734,6 +734,13 @@ node server.js username_cua_ban</pre>
         this.nickname = nickname || username;
         this.id = Math.random().toString(36).substring(2, 9);
         this.palette = PALETTES[Math.floor(Math.random() * PALETTES.length)];
+        // Anh 3D: vu cong demo dung dung anh cua minh (key = username);
+        // nguoi xem that boc ngau nhien 1 trong 8 anh 3D, giu nguyen
+        // trong suot thoi gian o tren san.
+        const spriteKeys = Object.keys(DANCER_SPRITES);
+        this.spriteKey = DANCER_SPRITES[username] ? username : (spriteKeys.length ? spriteKeys[Math.floor(Math.random() * spriteKeys.length)] : null);
+        // Tang toc khi duoc tang qua (nhay nhanh hon trong 6 giay)
+        this.boostUntil = 0;
         
         // Position on 2.5D floor
         // Xuất hiện ở vị trí dàn đều, xa các vũ công khác nhất
@@ -1544,15 +1551,18 @@ node server.js username_cua_ban</pre>
       const s = pos.scale;
       const now = Date.now();
       const isSolo = (dancer.soloUntil > now) || (CAMERA.activeDancer === dancer && now < CAMERA.zoomEndTime);
-      const speedMult = isSolo ? 1.85 : (STATE.isFever ? 1.5 : 1.0);
+      const boosted = now < dancer.boostUntil;
+      // Nhay nhe luc binh thuong; tang qua (solo/boost) hoac Fever thi nhanh + manh hon
+      const speedMult = isSolo ? 2.0 : (boosted ? 1.9 : (STATE.isFever ? 1.5 : 0.6));
+      const moveScale = (isSolo || boosted || STATE.isFever) ? 1 : 0.7;
       const t = beatTime * speedMult + dancer.animPhase;
 
       // --- Compute Articulated Skeletal Kinematics per Dance Style ---
-      let hipSwayX = Math.sin(t * 2) * 5 * s;
-      let torsoTilt = Math.sin(t) * 0.08;
-      let bounceY = Math.abs(Math.sin(t * 2)) * -7 * s;
-      let headNod = Math.sin(t * 2 + 0.4) * 0.1;
-      let headTilt = Math.cos(t) * 0.12;
+      let hipSwayX = Math.sin(t * 2) * 5 * s * moveScale;
+      let torsoTilt = Math.sin(t) * 0.08 * moveScale;
+      let bounceY = Math.abs(Math.sin(t * 2)) * -7 * s * moveScale;
+      let headNod = Math.sin(t * 2 + 0.4) * 0.1 * moveScale;
+      let headTilt = Math.cos(t) * 0.12 * moveScale;
 
       // Joint angles (radians)
       let lShoulderA = 0.4 + Math.sin(t * 2) * 0.6;
@@ -1685,15 +1695,15 @@ node server.js username_cua_ban</pre>
       }
 
       // Sprite nhân vật 3D thay cho bộ xương code (nhún theo nhịp, nghiêng theo nhạc)
-      const spriteImg = DANCER_SPRITES[dancer.username];
+      const spriteImg = DANCER_SPRITES[dancer.spriteKey || dancer.username];
       const hasSprite = !!(spriteImg && spriteImg.complete && spriteImg.naturalWidth > 0);
       if (hasSprite) {
         const sprH = 94 * s;
         const sprW = sprH * (spriteImg.naturalWidth / spriteImg.naturalHeight);
-        const sprBounce = Math.abs(Math.sin(t * 2)) * -7 * s;
-        const sprSway = Math.sin(t * 2) * 5 * s;
+        const sprBounce = Math.abs(Math.sin(t * 2)) * -7 * s * moveScale;
+        const sprSway = Math.sin(t * 2) * 5 * s * moveScale;
         const sprTilt = Math.sin(t) * 0.06;
-        const sprScale = isSolo ? 1.15 : 1.0;
+        const sprScale = (isSolo || boosted) ? 1.15 : 1.0;
         ctx.save();
         ctx.translate(sprSway, sprBounce);
         ctx.rotate(sprTilt);
@@ -2366,6 +2376,8 @@ node server.js username_cua_ban</pre>
 
       const dancer = getOrCreateDancer(username, nickname);
       dancer.applyGift(giftType, totalCoins);
+      // Tang qua: nhay nhanh + manh hon trong 6 giay (kem spotlight von co)
+      dancer.boostUntil = Date.now() + 6000;
 
       // Trigger Camera Spotlight Zoom & Solo Dance Routine!
       triggerCameraSpotlight(dancer, info.name, totalCoins);
