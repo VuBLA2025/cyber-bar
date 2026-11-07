@@ -1,3 +1,5 @@
 node_modules
 .env
 public/index.original.html
+public/assets/media-generation-*.webp
+public/assets/*.png

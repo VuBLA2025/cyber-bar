@@ -145,6 +145,30 @@ cổng **4193**, không chạm tới Sàn Vui cũ ở sanvui.bla.io.vn.
   qua `/api/tts` mới, hàng đợi + chờ 6s/câu, quà ≥ 299 xu chen hàng,
   nút bật/tắt giọng ở panel, `voiceOn` trong `/api/status`).
 
+## Nhân vật 3D dạng sprite (2026-11-07 tối, CHƯA deploy)
+
+- Dùng SKILL `tiktok-3d-character-prompts` tạo prompt cho 8 vũ công demo
+  (giữ nguyên mặt/tóc/dáng, chỉ đổi đồ; nền xanh #00FF00, A-pose, 9:16,
+  Pixar style). Đã gen ảnh xong 5/8: Huyền Trang (áo dài hồng thêu hoa
+  anh đào), Tiên DJ (tóc bob tím, áo LED hồng), Đại Gia Rồng (vest đen
+  thêu rồng vàng), Anh Ba Sài Gòn (sơ mi Hawaii đỏ), Phúc VIP (tuxedo
+  trắng, nơ kim cương). Còn lại 3 (giới hạn 4 ảnh/lượt gen): Linh Babie,
+  Hoàng Tử Sàn, Nam Hải Phòng.
+- Ảnh gốc `.webp` ở `assets/` (local). Tách nền xanh → PNG trong suốt
+  (alpha mềm theo độ xanh lá, crop sát người, resize rộng 256px) rồi
+  nhúng base64 vào `public/assets/dancer-sprites.js` (672KB) — vì
+  connector GitHub chỉ push được file text, không push được ảnh nhị
+  phân (tiền lệ: Ông Lão nhúng 8 ảnh nền base64). `.dockerignore` loại
+  `assets/*.webp` + `assets/*.png` khỏi image Docker.
+- Stage vẽ sprite thay cho bộ xương code khi vũ công có ảnh
+  (`DANCER_SPRITES[username]`, key = username như `huyen_trang`,
+  `thuy_tien_dj`, `dragon_master`, `anh_ba_sai_gon`, `phuc_vip`):
+  cao ~94×scale (bằng bộ xương cũ), nhún theo nhịp + lắc + nghiêng
+  nhẹ, solo to 1.15×; tên/tag/bong bóng chat vẫn vẽ như cũ; chưa có
+  ảnh thì vẽ bộ xương như cũ. Hạn chế: sprite là ảnh tĩnh nên không
+  xoay 360° / múa tay chân như bộ xương; tay áo dài của Đại Gia Rồng
+  với Anh Ba hơi chạm mép khung ảnh gốc (vẫn đủ dùng).
+
 ## Checklist áp dụng cho bản demo HTML sau này (đại ca dặn 2026-11-07)
 
 Khi đại ca đưa bản demo mới bằng file HTML, bổ sung đủ các chức năng này

@@ -369,6 +369,7 @@ node server.js username_cua_ban</pre>
   </div>
 
   <!-- MAIN SCRIPT -->
+  <script src="assets/dancer-sprites.js"></script>
   <script>
     /* =========================================================================
        TIKTOK LIVE CYBER BAR & DANCE CLUB - JAVASCRIPT ENGINE
@@ -1495,6 +1496,17 @@ node server.js username_cua_ban</pre>
       return { x: screenX, y: screenY, scale: perspScale * dancer.scale };
     }
 
+    // Sprite nhân vật 3D (ảnh AI nền xanh đã tách nền, nạp từ assets/dancer-sprites.js).
+    // Vũ công nào có ảnh thì vẽ ảnh thay cho bộ xương code.
+    const DANCER_SPRITES = {};
+    if (typeof window !== 'undefined' && window.DANCER_SPRITE_DATA) {
+      Object.entries(window.DANCER_SPRITE_DATA).forEach(([key, src]) => {
+        const img = new Image();
+        img.src = src;
+        DANCER_SPRITES[key] = img;
+      });
+    }
+
     // Draw Realistic Articulated 3D-Shaded Club Dancer on Floor
     function drawDancerAvatar(dancer) {
       const pos = getDancerScreenPos(dancer);
@@ -1641,14 +1653,34 @@ node server.js username_cua_ban</pre>
         ctx.restore();
       }
 
+      // Sprite nhân vật 3D thay cho bộ xương code (nhún theo nhịp, nghiêng theo nhạc)
+      const spriteImg = DANCER_SPRITES[dancer.username];
+      const hasSprite = !!(spriteImg && spriteImg.complete && spriteImg.naturalWidth > 0);
+      if (hasSprite) {
+        const sprH = 94 * s;
+        const sprW = sprH * (spriteImg.naturalWidth / spriteImg.naturalHeight);
+        const sprBounce = Math.abs(Math.sin(t * 2)) * -7 * s;
+        const sprSway = Math.sin(t * 2) * 5 * s;
+        const sprTilt = Math.sin(t) * 0.06;
+        const sprScale = isSolo ? 1.15 : 1.0;
+        ctx.save();
+        ctx.translate(sprSway, sprBounce);
+        ctx.rotate(sprTilt);
+        ctx.scale(sprScale, sprScale);
+        ctx.drawImage(spriteImg, -sprW / 2, -56 * s, sprW, sprH);
+        ctx.restore();
+      }
+
+      // Center origin at pelvis/waist level (dùng chung cho cả sprite lẫn bộ xương)
+      const pelvisX = hipSwayX;
+      const pelvisY = bounceY;
+
+      if (!hasSprite) {
       // Spin rotation
       if (dancer.rotation !== 0) {
         ctx.rotate(dancer.rotation);
       }
 
-      // Center origin at pelvis/waist level
-      const pelvisX = hipSwayX;
-      const pelvisY = bounceY;
 
       // Helper for drawing 3D-shaded capsule limbs
       function drawLimbSegment(x1, y1, x2, y2, w1, w2, baseColor, highlightColor) {
@@ -1973,6 +2005,8 @@ node server.js username_cua_ban</pre>
 
       ctx.restore(); // End head transform
       ctx.restore(); // End torso transform
+
+      } // hết if (!hasSprite) — vẽ bộ xương code
 
       // --- 6. FLOATING NAME TAG, DANCE ROUTINE BADGE & CHAT BUBBLE ---
       const tagY = pelvisY - (dancer.hasCrown ? 66 * s : 56 * s);
