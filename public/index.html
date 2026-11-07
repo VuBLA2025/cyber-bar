@@ -70,6 +70,9 @@
     body.stage-916 main { flex-direction:column; }
     body.stage-916 #canvas-container { flex:1 1 auto; width:100%; height:auto; min-height:0; }
     body.stage-916 #sidebar-panel { width:100%; height:34%; flex:0 0 34%; border-left:none; border-top:1px solid rgba(168,85,247,.3); }
+    body.stage-916 > main { min-height:0; }
+    body.stage-916 #sidebar-panel { min-height:0; }
+    body.stage-916 #tab-leaderboard, body.stage-916 #tab-chat { min-height:0; }
     body.stage-916 #bottom-controls, body.stage-916 #obs-hint { display:none !important; }
     body.stage-916 #btn-music, body.stage-916 #btn-conn-modal, body.stage-916 #btn-toggle-obs { display:none !important; }
     body.stage-916 #top-header { flex-wrap:wrap; }
@@ -79,6 +82,7 @@
   </style>
 </head>
 <body class="h-screen w-screen flex flex-col bg-[#070814] select-none">
+  <script>if (window.location.pathname === '/stage' || new URLSearchParams(window.location.search).get('view') === 'stage') document.body.classList.add('stage-916');</script>
 
   <!-- TOP HEADER / STREAM STATUS BAR -->
   <header id="top-header" class="relative z-30 bg-slate-950/80 backdrop-blur-md border-b border-pink-500/30 px-3 py-2 flex items-center justify-between text-xs sm:text-sm">
@@ -303,6 +307,9 @@
     </div>
   </footer>
 
+  <!-- Giọng đọc cảm ơn khi tặng quà (Edge TTS qua /api/tts) -->
+  <audio id="tts-audio" preload="auto" style="display:none"></audio>
+
   <!-- MODAL: KẾT NỐI TIKTOK LIVE THỰC TẾ & HƯỚNG DẪN CÀI ĐẶT -->
   <div id="conn-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-3">
     <div class="bg-slate-950 border border-pink-500/50 rounded-xl max-w-xl w-full p-4 sm:p-6 shadow-2xl relative flex flex-col max-h-[90vh] overflow-y-auto">
@@ -386,6 +393,7 @@ node server.js username_cua_ban</pre>
       isAutoDemo: true,
       isOBSClean: false,
       audioMuted: false,
+      voiceOn: true,
       activeTab: 'leaderboard',
       ws: null,
       wsConnected: false,
@@ -2318,6 +2326,49 @@ node server.js username_cua_ban</pre>
 
       // Update Leaderboard
       updateLeaderboard();
+
+      // Giọng đọc cảm ơn người tặng quà
+      speakGift(dancer.nickname || nickname || username, giftType, totalCoins);
+    }
+
+    // --- Giọng đọc cảm ơn khi tặng quà (Edge TTS qua /api/tts) ---
+    // Hàng đợi + chờ 6s giữa các câu (quà lớn >= 299 xu được chen hàng);
+    // quá 3 câu chờ thì bỏ câu cũ để giọng không bị tụt lại sau live.
+    const TTS_QUEUE = [];
+    let ttsPlaying = false;
+    let lastTtsAt = 0;
+    const TTS_COOLDOWN_MS = 6000;
+    const GIFT_VOICE_NAMES = { rose: 'hoa hồng', heart: 'bắn tim', cap: 'kính và mũ', champagne: 'sâm panh', fireworks: 'pháo hoa', galaxy: 'vũ trụ', lion: 'sư tử vàng' };
+    function speakGift(nickname, giftType, coins) {
+      if (!STATE.voiceOn) return;
+      const now = Date.now();
+      if (now - lastTtsAt < TTS_COOLDOWN_MS && coins < 299) return;
+      lastTtsAt = now;
+      const name = (nickname || 'bạn').replace(/[^\p{L}\p{N} _]/gu, '').trim() || 'bạn';
+      const gift = GIFT_VOICE_NAMES[giftType] || 'quà';
+      const big = coins >= 299;
+      const lines = big
+        ? [`${name} đại gia! Cảm ơn ${name} đã tặng ${gift}!`, `Cả club cảm ơn ${name}! ${gift} quá đỉnh!`]
+        : [`Cảm ơn ${name} đã tặng ${gift}!`, `${name} vừa tặng ${gift}! Cả sàn vỗ tay nào!`, `Cảm ơn ${name}! ${gift} hay quá, nhạc lên!`];
+      const text = lines[Math.floor(Math.random() * lines.length)];
+      if (big) TTS_QUEUE.unshift(text); else TTS_QUEUE.push(text);
+      if (TTS_QUEUE.length > 3) TTS_QUEUE.length = 3;
+      playTtsQueue();
+    }
+    async function playTtsQueue() {
+      if (ttsPlaying) return;
+      const text = TTS_QUEUE.shift();
+      if (!text) return;
+      const audio = document.getElementById('tts-audio');
+      if (!audio) return;
+      ttsPlaying = true;
+      try {
+        audio.src = '/api/tts?text=' + encodeURIComponent(text);
+        await audio.play();
+        await new Promise((res) => { audio.onended = res; audio.onerror = res; setTimeout(res, 15000); });
+      } catch (e) { /* trình duyệt chặn autoplay: bỏ câu này, câu sau thử lại */ }
+      ttsPlaying = false;
+      if (TTS_QUEUE.length) playTtsQueue();
     }
 
     // --- Hype & Fever Mode Logic ---
@@ -2599,6 +2650,26 @@ node server.js username_cua_ban</pre>
       }
     }
 
+    // Bật/tắt bot Demo (dàn vũ công/chat/quà giả lập) theo lệnh từ panel
+    function setDemo(on) {
+      if (on && !STATE.isAutoDemo) { STATE.isAutoDemo = true; const b = document.getElementById('auto-btn-text'); if (b) b.innerText = 'Tự Động Quẩy: BẬT'; runAutoSimulationTick(); }
+      if (!on && STATE.isAutoDemo) { STATE.isAutoDemo = false; const b = document.getElementById('auto-btn-text'); if (b) b.innerText = 'Tự Động Quẩy: TẮT'; }
+    }
+    // Nút bật tiếng chỉ ẩn khi nhạc đang chạy thật; còn im (trình duyệt chặn
+    // autoplay, context suspended) thì vẫn hiện để người xem chạm 1 lần.
+    function refreshSoundBtn() {
+      const sb = document.getElementById('stage-sound-btn');
+      if (!sb) return;
+      const running = (typeof audioCtx !== 'undefined' && audioCtx && audioCtx.state === 'running' && !STATE.audioMuted);
+      sb.style.display = running ? 'none' : 'flex';
+    }
+    function tryEnableAudio() {
+      initAudio();
+      STATE.audioMuted = false;
+      if (typeof audioCtx !== 'undefined' && audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      setTimeout(refreshSoundBtn, 400);
+    }
+
     // --- Stage 9:16: chỉ nghe WS, không subscribe (panel điều khiển kết nối) ---
     function connectStageListenWS() {
       const wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
@@ -2611,17 +2682,23 @@ node server.js username_cua_ban</pre>
             const data = JSON.parse(event.data);
             if (data.type === 'status') {
               if (data.mode === 'live') {
-                if (STATE.isAutoDemo) { STATE.isAutoDemo = false; const b = document.getElementById('auto-btn-text'); if (b) b.innerText = 'Tự Động Quẩy: TẮT'; }
+                setDemo(false); // live thật: bot tự tắt
                 updateConnStatus('connected', '@' + (data.username || '') + ' (Live)');
               } else {
-                if (!STATE.isAutoDemo) { STATE.isAutoDemo = true; const b = document.getElementById('auto-btn-text'); if (b) b.innerText = 'Tự Động Quẩy: BẬT'; runAutoSimulationTick(); }
+                setDemo(data.demo !== false); // idle: chạy theo nút bot ở panel
                 updateConnStatus('demo', 'Demo Mode');
               }
-              if (data.soundOn) { initAudio(); STATE.audioMuted = false; const sb = document.getElementById('stage-sound-btn'); if (sb) sb.style.display = 'none'; }
+              STATE.voiceOn = data.voiceOn !== false;
+              if (data.soundOn) tryEnableAudio();
+              refreshSoundBtn();
               return;
             }
-            if (data.type === 'soundOn') { initAudio(); STATE.audioMuted = false; const sb = document.getElementById('stage-sound-btn'); if (sb) sb.style.display = 'none'; return; }
-            if (data.type === 'soundOff') { STATE.audioMuted = true; return; }
+            if (data.type === 'soundOn') { tryEnableAudio(); return; }
+            if (data.type === 'soundOff') { STATE.audioMuted = true; refreshSoundBtn(); return; }
+            if (data.type === 'demoOn') { setDemo(true); return; }
+            if (data.type === 'demoOff') { setDemo(false); return; }
+            if (data.type === 'voiceOn') { STATE.voiceOn = true; return; }
+            if (data.type === 'voiceOff') { STATE.voiceOn = false; return; }
             if (data.type === 'error') return;
             handleIncomingLiveEvent(data);
           } catch (err) { console.error('Lỗi phân tích WebSocket message:', err); }
@@ -2918,12 +2995,7 @@ node server.js username_cua_ban</pre>
       if (IS_STAGE) {
         document.body.classList.add('stage-916');
         const sndBtn = document.getElementById('stage-sound-btn');
-        if (sndBtn) sndBtn.addEventListener('click', () => {
-          initAudio();
-          if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-          STATE.audioMuted = false;
-          sndBtn.style.display = 'none';
-        });
+        if (sndBtn) sndBtn.addEventListener('click', () => { tryEnableAudio(); });
         connectStageListenWS();
       }
 

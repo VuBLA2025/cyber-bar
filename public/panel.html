@@ -81,6 +81,24 @@
         <button id="btn-sound-off" class="btn btn-dark" disabled>Tắt tiếng stage</button>
       </div>
       <p class="text-xs text-slate-400 mt-2">Bật tiếng gửi lệnh tới stage đang mở (OBS / trình duyệt) ngay, không cần tải lại. Nếu stage mở trên trình duyệt thường mà vẫn im, bấm nút “Chạm để bật tiếng game” trên stage 1 lần.</p>
+      <div class="flex gap-2 flex-wrap items-center mt-3">
+        <span class="text-xs font-bold text-slate-300">🎙️ Giọng cảm ơn quà:</span>
+        <button id="btn-voice-on" class="btn btn-pink" disabled>Bật giọng</button>
+        <button id="btn-voice-off" class="btn btn-dark" disabled>Tắt giọng</button>
+        <span id="st-voice" class="text-xs font-bold text-slate-300">Trạng thái: BẬT</span>
+      </div>
+      <p class="text-xs text-slate-400 mt-2">Khi có người tặng quà, giọng nữ đọc cảm ơn tên người tặng + tên quà. Nói thưa ra (6 giây/câu), quà lớn được ưu tiên đọc trước.</p>
+    </section>
+
+    <!-- Bot Demo (Tự động quẩy) -->
+    <section class="card">
+      <h2 class="font-bold text-emerald-300 mb-2">🤖 Bot Demo (Tự động quẩy)</h2>
+      <div class="flex gap-2 flex-wrap items-center">
+        <button id="btn-demo-on" class="btn btn-pink" disabled>Bật bot Demo</button>
+        <button id="btn-demo-off" class="btn btn-dark" disabled>Tắt bot Demo</button>
+        <span id="st-demo" class="text-xs font-bold text-slate-300">Trạng thái: BẬT</span>
+      </div>
+      <p class="text-xs text-slate-400 mt-2">Bot Demo là dàn vũ công, chat với quà giả lập để stage luôn nhộn nhịp khi chưa live thật. Khi live thật bot tự tắt, hết live thì chạy lại theo nút này. Tắt bot thì stage chỉ còn vũ công thật từ TikTok.</p>
     </section>
 
     <!-- Thử hiệu ứng -->
@@ -137,7 +155,7 @@
     }
     function setAuthed(v, msg) {
       authed = v;
-      ['btn-connect', 'btn-disconnect', 'btn-sound-on', 'btn-sound-off', 'btn-test-chat', 'btn-test-gift', 'btn-test-like'].forEach(id => { $(id).disabled = !v; });
+      ['btn-connect', 'btn-disconnect', 'btn-sound-on', 'btn-sound-off', 'btn-demo-on', 'btn-demo-off', 'btn-voice-on', 'btn-voice-off', 'btn-test-chat', 'btn-test-gift', 'btn-test-like'].forEach(id => { $(id).disabled = !v; });
       $('login-status').innerText = msg || (v ? 'Đã đăng nhập — dùng được hết nút điều khiển.' : 'Chưa đăng nhập — chỉ xem trạng thái, chưa bấm được nút điều khiển.');
       $('login-status').className = 'text-xs mt-2 ' + (v ? 'text-emerald-400' : 'text-slate-400');
     }
@@ -151,6 +169,8 @@
         $('st-gifts').innerText = (s.totalGifts || 0).toLocaleString();
         $('st-coins').innerText = (s.totalCoins || 0).toLocaleString();
         $('st-sound').innerText = s.soundOn ? 'BẬT' : 'TẮT';
+        $('st-demo').innerText = 'Trạng thái: ' + (s.demo === false ? 'TẮT' : 'BẬT');
+        $('st-voice').innerText = 'Trạng thái: ' + (s.voiceOn === false ? 'TẮT' : 'BẬT');
         const badge = $('mode-badge');
         if (s.mode === 'live') { badge.innerText = '● LIVE'; badge.className = 'px-2.5 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/50 text-xs font-bold text-rose-400'; }
         else { badge.innerText = 'IDLE'; badge.className = 'px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-600 text-xs font-bold text-slate-300'; }
@@ -190,6 +210,26 @@
     });
     $('btn-sound-off').addEventListener('click', async () => {
       await api('/api/control', { method: 'POST', body: JSON.stringify({ action: 'soundOff' }) });
+      refreshStatus();
+    });
+    $('btn-demo-on').addEventListener('click', async () => {
+      const r = await api('/api/control', { method: 'POST', body: JSON.stringify({ action: 'demoOn' }) });
+      if (r.ok) $('st-demo').innerText = 'Trạng thái: BẬT';
+      refreshStatus();
+    });
+    $('btn-demo-off').addEventListener('click', async () => {
+      const r = await api('/api/control', { method: 'POST', body: JSON.stringify({ action: 'demoOff' }) });
+      if (r.ok) $('st-demo').innerText = 'Trạng thái: TẮT';
+      refreshStatus();
+    });
+    $('btn-voice-on').addEventListener('click', async () => {
+      const r = await api('/api/control', { method: 'POST', body: JSON.stringify({ action: 'voiceOn' }) });
+      if (r.ok) $('st-voice').innerText = 'Trạng thái: BẬT';
+      refreshStatus();
+    });
+    $('btn-voice-off').addEventListener('click', async () => {
+      const r = await api('/api/control', { method: 'POST', body: JSON.stringify({ action: 'voiceOff' }) });
+      if (r.ok) $('st-voice').innerText = 'Trạng thái: TẮT';
       refreshStatus();
     });
     $('btn-test-chat').addEventListener('click', async () => {

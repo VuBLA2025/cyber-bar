@@ -19,6 +19,8 @@ const { WebSocketServer } = require('ws');
 const { createHash } = require('node:crypto');
 const path = require('node:path');
 
+const TTS_VOICE = process.env.TTS_VOICE || 'vi-VN-HoaiMyNeural'; // nữ, hợp MC sàn nhảy
+
 const PORT = Number(process.env.PORT || 4193);
 const PANEL_KEY = process.env.PANEL_KEY || '';
 const ALLOWED_HOSTS = new Set(['localhost', '127.0.0.1', 'cyberbar.bla.io.vn']);
@@ -59,7 +61,7 @@ app.get('/api/me', (req, res) => res.json({ ok: true, authed: isAuthed(req), nee
 const state = {
   mode: 'idle', username: '', roomId: '', viewers: 0,
   totalLikes: 0, totalGifts: 0, totalCoins: 0, lastError: '', botOn: false,
-  game: 'cyber-bar', soundOn: false,
+  game: 'cyber-bar', soundOn: false, demo: true, voiceOn: true,
 };
 
 const httpServer = createServer(app);
@@ -162,7 +164,50 @@ app.post('/api/test/emit', requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-// --- WebSocket /ws: trang game nối tới đây ---
+// --- Giọng đọc cảm ơn khi tặng quà (Edge TTS tiếng Việt, giọng nữ) ---
+// Stage gọi /api/tts?text=... rồi phát file MP3. Không cần auth vì stage
+// (OBS, không có mật khẩu) cũng phải gọi được. Cache câu đã đọc để khỏi
+// gọi Edge lại cho cùng một câu.
+let MsEdgeTTS = null, OUTPUT_FORMAT = null;
+try { ({ MsEdgeTTS, OUTPUT_FORMAT } = require('msedge-tts')); } catch (e) { MsEdgeTTS = null; }
+function escapeXml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+async function edgeTts(text) {
+  if (!MsEdgeTTS) throw new Error('Chưa cài msedge-tts');
+  const tts = new MsEdgeTTS();
+  try {
+    await tts.setMetadata(TTS_VOICE, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
+    const { audioStream } = tts.toStream(escapeXml(text), { rate: '+8%', pitch: '+4%' });
+    const chunks = [];
+    const read = (async () => { for await (const c of audioStream) chunks.push(c); })();
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Edge TTS timeout')), 20000));
+    await Promise.race([read, timeout]);
+    if (chunks.length === 0) throw new Error('Edge TTS không trả âm thanh');
+    return Buffer.concat(chunks);
+  } finally {
+    try { tts.close(); } catch (e) {}
+  }
+}
+const ttsCache = new Map();
+app.get('/api/tts', async (req, res) => {
+  try {
+    const text = String(req.query.text || '').trim().slice(0, 200);
+    if (!text) return res.status(400).send('Thiếu text');
+    let audio = ttsCache.get(text);
+    if (!audio) {
+      audio = await edgeTts(text);
+      ttsCache.set(text, audio);
+      if (ttsCache.size > 200) ttsCache.delete(ttsCache.keys().next().value);
+    }
+    res.setHeader('Content-Type', 'audio/mpeg');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.send(audio);
+  } catch (err) {
+    console.error('TTS lỗi:', err && err.message ? err.message : err);
+    res.status(503).send('Không đọc được giọng lúc này');
+  }
+});
 wss.on('connection', (ws) => {
   ws.send(JSON.stringify({ type: 'status', ...state }));
   ws.on('message', async (raw) => {
@@ -180,12 +225,17 @@ wss.on('connection', (ws) => {
   });
 });
 
-// Điều khiển stage từ panel: bật/tắt tiếng (gửi tới mọi stage đang mở qua WS).
+// Điều khiển stage từ panel: bật/tắt tiếng + bật/tắt bot Demo
+// (gửi tới mọi stage đang mở qua WS; live thật thì bot tự tắt).
 app.post('/api/control', requireAuth, (req, res) => {
   const action = req.body?.action;
   if (action === 'soundOn') { state.soundOn = true; broadcast({ type: 'soundOn' }); }
   else if (action === 'soundOff') { state.soundOn = false; broadcast({ type: 'soundOff' }); }
-  else return res.status(400).json({ ok: false, error: 'action phải là soundOn/soundOff' });
+  else if (action === 'demoOn') { state.demo = true; broadcast({ type: 'demoOn' }); }
+  else if (action === 'demoOff') { state.demo = false; broadcast({ type: 'demoOff' }); }
+  else if (action === 'voiceOn') { state.voiceOn = true; broadcast({ type: 'voiceOn' }); }
+  else if (action === 'voiceOff') { state.voiceOn = false; broadcast({ type: 'voiceOff' }); }
+  else return res.status(400).json({ ok: false, error: 'action phải là soundOn/soundOff/demoOn/demoOff/voiceOn/voiceOff' });
   broadcastStatus();
   res.json({ ok: true, ...state });
 });

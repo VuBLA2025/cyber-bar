@@ -129,8 +129,51 @@ cổng **4193**, không chạm tới Sàn Vui cũ ở sanvui.bla.io.vn.
 - Test local (PORT=4193, PANEL_KEY=test): `/` ra panel, `/stage` ra
   game có `stage-916`, login sai 403 / đúng 200 + cookie, `/api/me`
   theo cookie, control không key 403 / đúng key 200 + `soundOn:true`
-  trong `/api/status`. Còn chờ: xem stage 9:16 bằng mắt (screenshot
-  540×960 qua trình duyệt) rồi mới push + deploy.
+  trong `/api/status`.
+- Xem stage live bằng mắt (browser, 2026-11-07 ~18:47): khung dọc 9:16
+  đúng (canvas trên + BXH/chat dưới), header + hype meter + Fever
+  chạy tốt, toolbar thử quà đã ẩn, panel đủ mục và nút bị khóa đúng khi
+  chưa đăng nhập. Lỗi nhỏ thấy được: tên vũ công chồng nhau khi
+  spotlight (chưa sửa — do code vẽ gốc), hàng thống kê cuối sidebar bị
+  cắt (đã sửa bằng `min-height:0`), lúc mới mở chớp qua layout ngang
+  1 thoáng (đã sửa bằng script thêm class ngay khi `<body>` mở), nút
+  bật tiếng không hiện vì `soundOn` đang BẬT do test trước đó (đã sửa:
+  nút chỉ ẩn khi nhạc chạy thật, deploy mới reset `soundOn` về TẮT).
+- Thêm sau đó, cùng đợt deploy này: **nút tắt/mở bot Demo ở panel**
+  (`/api/control` demoOn/demoOff, stage nghe qua WS, live thật tự tắt)
+  và **giọng đọc cảm ơn khi tặng quà** (Edge TTS `vi-VN-HoaiMyNeural`
+  qua `/api/tts` mới, hàng đợi + chờ 6s/câu, quà ≥ 299 xu chen hàng,
+  nút bật/tắt giọng ở panel, `voiceOn` trong `/api/status`).
+
+## Checklist áp dụng cho bản demo HTML sau này (đại ca dặn 2026-11-07)
+
+Khi đại ca đưa bản demo mới bằng file HTML, bổ sung đủ các chức năng này
+trước khi deploy (đừng chỉ đưa file tĩnh lên):
+
+1. **Server bridge Node** (Express + `ws` + `tiktok-live-connector`):
+   WS cùng origin `/ws` (không `localhost:8081`), `/api/status`,
+   `/api/login` + `/api/me` (cookie `PANEL_KEY`), `/api/tiktok/connect` /
+   `disconnect`, `/api/test/emit` (chat/gift/like), `/api/control`
+   (sound/demo/voice), `/api/tts`.
+2. **Stage dọc 9:16** ở `/stage` (nguồn OBS 540×960): class `stage-916`
+   thêm ngay khi `<body>` mở (khỏi chớp layout ngang lúc mới tải);
+   canvas sàn trên + sidebar BXH/chat dưới 34% (`min-height:0` để hàng
+   thống kê cuối không bị cắt); ẩn toolbar thử quà; stage tự mở WS
+   chế độ chỉ-nghe.
+3. **Trang điều khiển riêng** ở `/`: đăng nhập `PANEL_KEY`, trạng thái
+   live (poll 2s), kết nối TikTok, bật/tắt tiếng stage, thử chat/quà/like,
+   link stage + sao chép.
+4. **Bot Demo tắt/mở được từ panel** (mặc định BẬT; live thật tự tắt;
+   hết live chạy lại theo nút panel).
+5. **Giọng đọc cảm ơn khi tặng quà**: Edge TTS `vi-VN-HoaiMyNeural` qua
+   `/api/tts` (cache câu đã đọc); stage hàng đợi tối đa 3 câu + chờ
+   6 giây/câu, quà ≥ 299 xu chen hàng; nút bật/tắt giọng ở panel.
+6. **Nhạc nền + tiếng**: nút “Chạm để bật tiếng game” trên stage chỉ ẩn
+   khi nhạc đang chạy thật (còn `suspended` thì vẫn hiện để chạm lại).
+7. **Deploy bền**: repo GitHub + `docker-compose.yml` PHẢI có mục
+   `build:` (không thì Dokploy lỗi sau ~4s vì không có image để pull),
+   `githubId` `0-f_X4vn1CYb3EnTqIaQo`, domain `https:true`, dùng
+   `compose.deploy` (không `compose.redeploy`).
 
 ## Chưa kiểm chứng
 
