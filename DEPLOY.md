@@ -73,7 +73,13 @@ cổng **4193**, không chạm tới Sàn Vui cũ ở sanvui.bla.io.vn.
    - https://cyberbar.bla.io.vn/api/status — JSON `{mode:'idle',...}`
    - Mở modal 🔗, nhập username TikTok + mật khẩu panel, bấm Kết Nối.
 
-## Chưa kiểm chứng
+- Deploy 1 lỗi ngay sau ~4s (status error, không có errorMessage): nguyên
+  nhân là `docker-compose.yml` lúc đầu chỉ ghi `image: cyber-bar:1.0.0` mà
+  không có mục `build:` — Dokploy không có image nào để pull. Bài học:
+  compose build từ GitHub PHẢI có `build: {context: ., dockerfile:
+  Dockerfile}` như Lớp Học Chữ / Đi Chùa (Sàn Vui 3D không có vì chưa bao
+  giờ deploy từ GitHub). Đã sửa file, push lại, deploy lại.
+- Trạng thái deploy 2026-11-07 — ĐANG DEPLOY LẠI (sau khi sửa build).
 
 - Kết nối TikTok LIVE thật, quà/chat/like thật chạy vào game, nhạc + hiệu
   ứng nghe/nhìn bằng mắt trên live thật.

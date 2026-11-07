@@ -1,8 +1,16 @@
 services:
   app:
+    # Build từ Dockerfile Node trong bộ này — Dokploy build image này từ
+    # repo rồi chạy, không pull image có sẵn. KHÔNG được bỏ mục build:
+    # chỉ ghi image thì Dokploy lỗi ngay (deploy 1 lỗi sau ~4s, không có
+    # errorMessage) vì không có image cyber-bar:1.0.0 nào để pull.
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: cyber-bar:1.0.0
     environment:
       PORT: "4193"
+      NODE_ENV: "production"
       # Mật khẩu panel — đặt giá trị thật trong phần Environment của Dokploy,
       # KHÔNG ghi mật khẩu thật vào file này.
       PANEL_KEY: "${PANEL_KEY}"
