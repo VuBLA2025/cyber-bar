@@ -179,6 +179,14 @@ cổng **4193**, không chạm tới Sàn Vui cũ ở sanvui.bla.io.vn.
   trong game (`thuy_tien_dj`, `dragon_master`) — lookup
   `DANCER_SPRITES[dancer.username]` trả rỗng nên rơi về bộ xương code.
   Đã đổi tên 2 key cho khớp username; giờ 8/8 key = 8/8 username.
+  **Nhưng trình duyệt vẫn nhận file cũ:** file `dancer-sprites.js`
+  bị cache 4h (`Cache-Control: public, max-age=14400`, qua Cloudflare)
+  nên trình duyệt kiểm tra vẫn nhận bản 5-sprite cũ (672KB, 5 key
+  `huyen_trang/tien_dj/dai_gia_rong/anh_ba_sai_gon/phuc_vip`) dù
+  origin đã có bản 8-sprite — kể cả sau hard refresh. Sửa bằng
+  versioned URL: `<script src="assets/dancer-sprites.js?v=8">`
+  (đổi số version mỗi lần sửa file này). Bài học: asset lớn đổi nội
+  dung thì phải đổi URL, không thì cache giữ bản cũ tới 4h.
 
 ## Checklist áp dụng cho bản demo HTML sau này (đại ca dặn 2026-11-07)
 
