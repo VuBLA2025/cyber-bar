@@ -167,6 +167,12 @@ cổng **4193**, không chạm tới Sàn Vui cũ ở sanvui.bla.io.vn.
   Lưu ý: Nam Hải Phòng tay buông xuôi (không A-pose) nhưng làm sprite
   vẫn ổn; tay áo dài của Đại Gia Rồng với Anh Ba hơi chạm mép khung ảnh
   gốc (vẫn đủ dùng).
+- Dàn đều vũ công (2026-11-07 tối, sửa lỗi tên chồng nhau thấy qua 2 lần
+  xem bằng mắt): vị trí xuất hiện + đi lang thang đều chọn chỗ xa các
+  vũ công khác nhất (`pickSpreadPosition`: lấy mẫu 10 ứng viên, chọn
+  ứng viên có khoảng cách tới vũ công gần nhất lớn nhất); bảng tên va
+  chạm thì dồn lên trên tối đa 3 nấc (`drawnNameTags` theo khung hình).
+  Vũ công solo spotlight vẫn về giữa sàn như cũ.
 
 ## Checklist áp dụng cho bản demo HTML sau này (đại ca dặn 2026-11-07)
 
