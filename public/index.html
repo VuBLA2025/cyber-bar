@@ -69,7 +69,7 @@
     body.stage-916 > header, body.stage-916 > main, body.stage-916 > footer { width:min(100vw, calc(100dvh * 9 / 16)); margin-left:auto; margin-right:auto; }
     body.stage-916 main { flex-direction:column; }
     body.stage-916 #canvas-container { flex:1 1 auto; width:100%; height:auto; min-height:0; }
-    body.stage-916 #sidebar-panel { width:100%; height:34%; flex:0 0 34%; border-left:none; border-top:1px solid rgba(168,85,247,.3); }
+    body.stage-916 #sidebar-panel { display:none !important; }
     body.stage-916 > main { min-height:0; }
     body.stage-916 #sidebar-panel { min-height:0; }
     body.stage-916 #tab-leaderboard, body.stage-916 #tab-chat { min-height:0; }
@@ -164,14 +164,18 @@
         </div>
       </div>
 
-      <!-- BANG DAI GIA + QUA TANG: list doc giua-phia tren -->
-      <div id="top-boards" class="absolute top-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-[min(68%,280px)] flex flex-col gap-1.5">
+      <!-- BANG DAI GIA: list doc giua-phia tren -->
+      <div id="top-boards" class="absolute top-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-[min(68%,280px)]">
         <div class="rounded-xl bg-slate-950/80 border border-yellow-500/40 backdrop-blur-md px-2 py-1 shadow-lg">
           <div class="text-center font-gaming font-black text-[11px] tracking-wider text-yellow-300">🏆 BXH ĐẠI GIA</div>
           <div id="top-dai-gia-list" class="flex flex-col gap-px mt-0.5"></div>
         </div>
-        <div class="rounded-xl bg-slate-950/80 border border-pink-500/40 backdrop-blur-md px-2 py-1 shadow-lg">
-          <div class="text-center font-gaming font-black text-[11px] tracking-wider text-pink-300">🎁 QUÀ TẶNG</div>
+      </div>
+
+      <!-- BANG QUA TANG: nho lai, sang ben phai (khoi che nguoi) -->
+      <div id="top-gifts" class="absolute top-24 right-2 z-20 pointer-events-none w-[160px]">
+        <div class="rounded-xl bg-slate-950/75 border border-pink-500/40 backdrop-blur-md px-1.5 py-1 shadow-lg">
+          <div class="text-center font-gaming font-black text-[10px] tracking-wider text-pink-300">🎁 QUÀ TẶNG</div>
           <div id="top-gift-list" class="flex flex-col gap-px mt-0.5"></div>
         </div>
       </div>
@@ -2662,7 +2666,7 @@ node server.js username_cua_ban</pre>
       if (giftBoard) {
         giftBoard.innerHTML = STATE.recentGifts.length === 0
           ? `<div class="text-slate-500 text-center py-1 text-[11px]">Chưa có quà tặng...</div>`
-          : STATE.recentGifts.map(g => `<div class="flex items-center justify-between gap-1 px-1 py-px text-[11px]"><span class="font-bold text-slate-200 truncate">${g.nickname}</span><span class="truncate text-pink-300">${g.giftName}</span><span class="font-gaming font-bold text-yellow-400 whitespace-nowrap">+${g.coins.toLocaleString()} Xu</span></div>`).join('');
+          : STATE.recentGifts.map(g => `<div class="flex items-center justify-between gap-1 px-1 py-px text-[10px]"><span class="font-bold text-slate-200 truncate">${g.nickname}</span><span class="truncate text-pink-300">${g.giftName}</span><span class="font-gaming font-bold text-yellow-400 whitespace-nowrap">+${g.coins.toLocaleString()} Xu</span></div>`).join('');
       }
     }
 

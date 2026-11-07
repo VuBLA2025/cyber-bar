@@ -217,6 +217,16 @@ cổng **4193**, không chạm tới Sàn Vui cũ ở sanvui.bla.io.vn.
   tab LIVE CHAT (`if (IS_STAGE) tabChatBtn.click()`). Bản ngang (panel)
   vẫn giữ cả 2 tab sidebar như cũ.
 
+## Bỏ chat ở stage + quà tặng sang phải (2026-11-07 tối)
+
+- Stage 9:16: bỏ luôn cả sidebar chat (`#sidebar-panel` display:none)
+  để sàn nhảy cao rộng ra hết khung dọc. Bản ngang (panel) vẫn giữ
+  sidebar chat như cũ (chat vẫn chảy vào DOM, chỉ bị ẩn ở stage).
+- Bảng quà tặng tách khỏi bảng đại gia: thu nhỏ lại (rộng 160px, chữ
+  10px) và chuyển sang bên phải (`#top-gifts`, top-24 right-2, dưới
+  vùng HUD spotlight) để khỏi che người; bảng đại gia giữ nguyên
+  giữa-phía trên.
+
 ## Checklist áp dụng cho bản demo HTML sau này (đại ca dặn 2026-11-07)
 
 Khi đại ca đưa bản demo mới bằng file HTML, bổ sung đủ các chức năng này
