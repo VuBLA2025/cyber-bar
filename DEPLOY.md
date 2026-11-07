@@ -161,7 +161,9 @@ cổng **4193**, không chạm tới Sàn Vui cũ ở sanvui.bla.io.vn.
   được ảnh nhị phân (tiền lệ: Ông Lão nhúng 8 ảnh nền base64).
   `.dockerignore` loại `assets/*.webp` + `assets/*.png` khỏi image Docker.
   Đã gen ảnh xong 8/8 (thêm Linh Babie váy hồng bèo nơ, Hoàng Tử Sàn
-  blazer nhung tím + vương miện vàng, Nam Hải Phòng áo da đinh tán).
+  blazer nhung tím + vương miện vàng, Nam Hải Phòng áo da đinh tán —
+  deploy 6 `GvXLYfsRRRvf21PO9kEl6` done, commit 66234c24, verify live:
+  sprites.js 200 đủ 8 key, stage 200, 8 game còn lại 200).
   Lưu ý: Nam Hải Phòng tay buông xuôi (không A-pose) nhưng làm sprite
   vẫn ổn; tay áo dài của Đại Gia Rồng với Anh Ba hơi chạm mép khung ảnh
   gốc (vẫn đủ dùng).
