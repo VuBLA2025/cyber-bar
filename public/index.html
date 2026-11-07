@@ -1,0 +1,2872 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok Live Cyber Bar & Dance Club - Game Sàn Nhảy Tương Tác</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #070714;
+      color: #e2e8f0;
+      overflow: hidden;
+      user-select: none;
+    }
+    .font-gaming {
+      font-family: 'Orbitron', monospace, sans-serif;
+    }
+    /* Custom Neon Glows */
+    .neon-text-pink {
+      text-shadow: 0 0 8px rgba(244, 63, 94, 0.8), 0 0 16px rgba(244, 63, 94, 0.4);
+    }
+    .neon-text-cyan {
+      text-shadow: 0 0 8px rgba(6, 182, 212, 0.8), 0 0 16px rgba(6, 182, 212, 0.4);
+    }
+    .neon-text-yellow {
+      text-shadow: 0 0 8px rgba(234, 179, 8, 0.8), 0 0 16px rgba(234, 179, 8, 0.4);
+    }
+    .neon-border-pink {
+      box-shadow: 0 0 15px rgba(244, 63, 94, 0.4), inset 0 0 15px rgba(244, 63, 94, 0.2);
+    }
+    .neon-border-cyan {
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), inset 0 0 15px rgba(6, 182, 212, 0.2);
+    }
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(244, 63, 94, 0.5);
+      border-radius: 4px;
+    }
+    /* Animations */
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.03); }
+    }
+    .pulse-glow {
+      animation: pulseGlow 1.8s infinite ease-in-out;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+    .animate-marquee {
+      display: inline-block;
+      white-space: nowrap;
+      animation: marquee 12s linear infinite;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col bg-[#070814] select-none">
+
+  <!-- TOP HEADER / STREAM STATUS BAR -->
+  <header id="top-header" class="relative z-30 bg-slate-950/80 backdrop-blur-md border-b border-pink-500/30 px-3 py-2 flex items-center justify-between text-xs sm:text-sm">
+    <!-- Club Branding & Live Indicator -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/50 text-rose-400 font-bold tracking-wider animate-pulse">
+        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+        <span>LIVE</span>
+      </div>
+      <div>
+        <h1 class="font-gaming font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-400 to-cyan-400 tracking-wider text-sm sm:text-base flex items-center gap-1.5">
+          <span>🎧 CYBER CLUB</span>
+          <span class="text-[10px] sm:text-xs font-normal text-cyan-300/80 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">TikTok Dance Floor</span>
+        </h1>
+      </div>
+    </div>
+
+    <!-- Hype Meter (Nhiệt Huyết Sàn Nhảy) -->
+    <div class="flex-1 max-w-xs sm:max-w-md mx-3">
+      <div class="flex justify-between items-center mb-1 text-[11px] font-bold">
+        <span class="text-pink-400 flex items-center gap-1">
+          <span>🔥</span>
+          <span class="uppercase tracking-wide">HYPE METER / FEVER DROP</span>
+        </span>
+        <span id="hype-percent" class="font-gaming text-cyan-300">0%</span>
+      </div>
+      <div class="w-full bg-slate-900/90 rounded-full h-3 p-0.5 border border-pink-500/40 overflow-hidden relative shadow-[0_0_10px_rgba(236,72,153,0.3)]">
+        <div id="hype-bar" class="h-full rounded-full bg-gradient-to-r from-pink-600 via-purple-500 to-cyan-400 transition-all duration-300" style="width: 0%"></div>
+        <div id="fever-text" class="absolute inset-0 flex items-center justify-center font-gaming text-[9px] font-black tracking-widest text-white drop-shadow opacity-0 transition-opacity">
+          ⚡ FEVER MODE ACTIVE 2X POINTS ⚡
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls & Info -->
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <!-- Music toggle -->
+      <button id="btn-music" title="Bật/Tắt nhạc nền Beat" class="flex items-center gap-1 px-2 py-1 rounded bg-slate-900 border border-purple-500/50 hover:bg-purple-900/40 text-purple-300 transition">
+        <span id="music-icon">🎵</span>
+        <span id="music-status" class="hidden sm:inline font-gaming text-[11px]">MUSIC: ON</span>
+      </button>
+
+      <!-- Connection Status Button -->
+      <button id="btn-conn-modal" class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-900 border border-slate-700 hover:border-cyan-500/60 text-slate-300 transition">
+        <span id="conn-dot" class="w-2 h-2 rounded-full bg-yellow-400"></span>
+        <span id="conn-label" class="text-[11px] font-semibold">Demo Mode</span>
+      </button>
+
+      <!-- OBS Hide UI Toggle -->
+      <button id="btn-toggle-obs" title="Ẩn điều khiển cho OBS (Phím H)" class="px-2 py-1 rounded bg-slate-900 border border-pink-500/40 hover:bg-pink-950/50 text-pink-300 text-xs font-semibold">
+        <span>🎬 OBS</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN STAGE WRAPPER -->
+  <main class="relative flex-1 w-full h-full overflow-hidden flex">
+
+    <!-- CANVAS VIEWPORT (THE 3D/2.5D DANCE FLOOR & CLUB) -->
+    <div id="canvas-container" class="relative flex-1 h-full w-full bg-[#05060f] overflow-hidden">
+      <canvas id="club-canvas" class="w-full h-full block cursor-pointer"></canvas>
+
+      <!-- FLOATING GIFT NOTIFICATION BANNER -->
+      <div id="gift-banner-container" class="absolute top-4 left-4 z-20 pointer-events-none flex flex-col gap-2 max-w-sm"></div>
+
+      <!-- SPOTLIGHT VIP ZOOM CAMERA HUD -->
+      <div id="spotlight-hud" class="absolute top-4 right-4 z-20 pointer-events-none opacity-0 transition-all duration-500 transform translate-y-[-10px] flex flex-col items-end gap-1.5">
+        <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-rose-600/90 via-pink-600/90 to-purple-600/90 border border-pink-300/60 shadow-[0_0_20px_rgba(244,63,94,0.6)] backdrop-blur-md">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-300 animate-ping"></span>
+          <span class="font-gaming font-black text-xs sm:text-sm text-white tracking-wider">🎥 VIP SPOTLIGHT CAM</span>
+        </div>
+        <div class="px-3.5 py-2 rounded-xl bg-slate-950/85 border border-cyan-400/50 backdrop-blur-md text-right shadow-xl">
+          <div id="spotlight-dancer-name" class="font-bold text-sm sm:text-base text-yellow-300 neon-text-yellow">@VIP_Dancer</div>
+          <div id="spotlight-gift-info" class="text-xs text-pink-300 font-semibold">Vừa tặng Xu • Đang Solo Vũ Đạo!</div>
+          <div id="spotlight-dance-style" class="mt-1 inline-block px-2 py-0.5 rounded bg-cyan-950/90 border border-cyan-400/40 font-gaming text-[10px] text-cyan-300">
+            🕺 Vũ đạo: Melbourne Shuffle
+          </div>
+        </div>
+      </div>
+
+      <!-- FEVER DROP OVERLAY EFFECT -->
+      <div id="fever-overlay" class="absolute inset-0 pointer-events-none z-10 opacity-0 transition-opacity duration-500 bg-gradient-to-b from-purple-900/20 via-pink-900/10 to-cyan-900/20"></div>
+
+      <!-- GALAXY / LION SPECIAL FULLSCREEN FX CANVAS -->
+      <canvas id="fx-canvas" class="absolute inset-0 pointer-events-none z-15 w-full h-full"></canvas>
+
+      <!-- OBS TIP BANNER (Press H to toggle clean mode) -->
+      <div id="obs-hint" class="absolute bottom-2 left-3 z-20 pointer-events-none text-[11px] text-slate-400/80 bg-slate-950/70 px-2 py-0.5 rounded border border-slate-800">
+        💡 Mẹo: Nhấn phím <span class="text-cyan-400 font-bold">H</span> hoặc nút <span class="text-pink-400 font-bold">🎬 OBS</span> để ẩn/hiện thanh công cụ khi live stream!
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR: LEADERBOARD & LIVE CHAT FEED (COLLAPSIBLE) -->
+    <aside id="sidebar-panel" class="relative z-20 w-72 sm:w-80 h-full bg-slate-950/90 backdrop-blur-lg border-l border-purple-500/30 flex flex-col text-xs transition-all duration-300">
+      <!-- Tab Header -->
+      <div class="flex border-b border-slate-800 bg-slate-900/80">
+        <button id="tab-leaderboard-btn" class="flex-1 py-2 font-bold text-center border-b-2 border-pink-500 text-pink-400 flex items-center justify-center gap-1.5 transition">
+          <span>🏆</span>
+          <span>BXH ĐẠI GIA</span>
+        </button>
+        <button id="tab-chat-btn" class="flex-1 py-2 font-bold text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition">
+          <span>💬</span>
+          <span>LIVE CHAT (<span id="chat-count">0</span>)</span>
+        </button>
+      </div>
+
+      <!-- Tab Content: Leaderboard -->
+      <div id="tab-leaderboard" class="flex-1 overflow-y-auto p-2.5 flex flex-col gap-1.5">
+        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex justify-between">
+          <span>Dân chơi VIP sàn nhảy</span>
+          <span class="text-pink-400">Điểm Quà</span>
+        </div>
+        <div id="leaderboard-list" class="flex flex-col gap-1.5">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Tab Content: Live Chat (Hidden by default) -->
+      <div id="tab-chat" class="hidden flex-1 overflow-y-auto p-2.5 flex flex-col gap-1.5">
+        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex justify-between">
+          <span>Bình luận người xem</span>
+          <span class="text-cyan-400">Tự động cuộn</span>
+        </div>
+        <div id="chat-stream-list" class="flex flex-col gap-1.5">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Club Stats Summary in Sidebar -->
+      <div class="p-2 border-t border-slate-800/80 bg-slate-950 flex justify-around text-center text-[10px]">
+        <div>
+          <div class="text-slate-400">Vũ Công Sàn</div>
+          <div id="stat-dancers" class="font-gaming font-bold text-pink-400 text-sm">0</div>
+        </div>
+        <div>
+          <div class="text-slate-400">Lượt Thả Tim</div>
+          <div id="stat-likes" class="font-gaming font-bold text-rose-400 text-sm">0</div>
+        </div>
+        <div>
+          <div class="text-slate-400">Tổng Quà Tặng</div>
+          <div id="stat-gifts" class="font-gaming font-bold text-yellow-400 text-sm">0</div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- BOTTOM CONTROL DECK / STREAMER TOOLBAR -->
+  <footer id="bottom-controls" class="relative z-30 bg-slate-950/95 backdrop-blur-md border-t border-purple-500/30 p-2 sm:p-2.5 flex flex-col gap-2 transition-all duration-300">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <!-- Quick Gifts Simulation Trigger Buttons -->
+      <div class="flex items-center gap-1 sm:gap-1.5 flex-wrap">
+        <span class="text-[10px] sm:text-xs font-bold text-pink-400 uppercase tracking-wider flex items-center gap-1 mr-1">
+          <span>🎁</span>
+          <span>Bấm thử Quà:</span>
+        </span>
+        <button data-gift="rose" class="gift-btn px-2 py-1 rounded bg-slate-900 border border-rose-500/40 hover:bg-rose-950/40 hover:border-rose-400 text-rose-300 text-xs font-bold flex items-center gap-1 transition">
+          <span>🌹</span>
+          <span>Hoa Hồng (10)</span>
+        </button>
+        <button data-gift="heart" class="gift-btn px-2 py-1 rounded bg-slate-900 border border-pink-500/40 hover:bg-pink-950/40 hover:border-pink-400 text-pink-300 text-xs font-bold flex items-center gap-1 transition">
+          <span>💖</span>
+          <span>Bắn Tim (50)</span>
+        </button>
+        <button data-gift="cap" class="gift-btn px-2 py-1 rounded bg-slate-900 border border-blue-500/40 hover:bg-blue-950/40 hover:border-blue-400 text-blue-300 text-xs font-bold flex items-center gap-1 transition">
+          <span>🧢</span>
+          <span>Kính & Mũ (99)</span>
+        </button>
+        <button data-gift="champagne" class="gift-btn px-2 py-1 rounded bg-slate-900 border border-amber-500/40 hover:bg-amber-950/40 hover:border-amber-400 text-amber-300 text-xs font-bold flex items-center gap-1 transition">
+          <span>🍾</span>
+          <span>Sâm Panh (299)</span>
+        </button>
+        <button data-gift="fireworks" class="gift-btn px-2 py-1 rounded bg-slate-900 border border-cyan-500/40 hover:bg-cyan-950/40 hover:border-cyan-400 text-cyan-300 text-xs font-bold flex items-center gap-1 transition">
+          <span>🎆</span>
+          <span>Pháo Hoa (1088)</span>
+        </button>
+        <button data-gift="galaxy" class="gift-btn px-2 py-1 rounded bg-slate-900 border border-purple-500/40 hover:bg-purple-950/40 hover:border-purple-400 text-purple-300 text-xs font-bold flex items-center gap-1 transition">
+          <span>🌌</span>
+          <span>Vũ Trụ (1000)</span>
+        </button>
+        <button data-gift="lion" class="gift-btn px-2 py-1 rounded bg-gradient-to-r from-amber-600/30 to-yellow-500/30 border border-yellow-400/60 hover:from-amber-600/50 hover:to-yellow-500/50 text-yellow-300 text-xs font-black flex items-center gap-1 transition shadow-[0_0_10px_rgba(234,179,8,0.2)]">
+          <span>🦁</span>
+          <span>Sư Tử Vàng (29999)</span>
+        </button>
+      </div>
+
+      <!-- Action Simulation & Auto Stream Toggle -->
+      <div class="flex items-center gap-1.5 ml-auto">
+        <!-- Quick Like Button -->
+        <button id="btn-sim-like" class="px-2.5 py-1 rounded bg-rose-900/30 border border-rose-500/50 hover:bg-rose-900/60 text-rose-300 text-xs font-bold flex items-center gap-1 transition">
+          <span>❤️</span>
+          <span>+50 Like</span>
+        </button>
+
+        <!-- Auto Simulation Mode Toggle -->
+        <button id="btn-toggle-auto" class="px-2.5 py-1 rounded bg-purple-900/40 border border-purple-400 hover:bg-purple-800/60 text-purple-200 text-xs font-bold flex items-center gap-1 transition shadow-[0_0_8px_rgba(168,85,247,0.3)]">
+          <span id="auto-spin-icon" class="inline-block animate-spin">⚡</span>
+          <span id="auto-btn-text">Tự Động Quẩy: BẬT</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Chat Command Input & Slang Buttons -->
+    <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1 text-[11px] text-slate-400 hidden md:flex">
+        <span>Lệnh chat:</span>
+        <button class="cmd-pill px-1.5 py-0.5 rounded bg-slate-900 hover:bg-pink-900/40 text-pink-300 border border-pink-500/30 font-mono">nhay</button>
+        <button class="cmd-pill px-1.5 py-0.5 rounded bg-slate-900 hover:bg-cyan-900/40 text-cyan-300 border border-cyan-500/30 font-mono">uong</button>
+        <button class="cmd-pill px-1.5 py-0.5 rounded bg-slate-900 hover:bg-yellow-900/40 text-yellow-300 border border-yellow-500/30 font-mono">nhaylen</button>
+        <button class="cmd-pill px-1.5 py-0.5 rounded bg-slate-900 hover:bg-purple-900/40 text-purple-300 border border-purple-500/30 font-mono">xoay</button>
+        <button class="cmd-pill px-1.5 py-0.5 rounded bg-slate-900 hover:bg-emerald-900/40 text-emerald-300 border border-emerald-500/30 font-mono">123zo</button>
+      </div>
+
+      <div class="flex-1 flex gap-1.5">
+        <input id="input-test-chat" type="text" placeholder="Nhập bình luận hoặc lệnh thử (ví dụ: 'quẩy lên nào', 'nhay', 'uong')..." class="flex-1 px-3 py-1 bg-slate-900/90 border border-slate-700 focus:border-pink-500 rounded text-xs text-white placeholder-slate-500 outline-none">
+        <button id="btn-send-chat" class="px-3 py-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold rounded text-xs transition">
+          Gửi Chat
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL: KẾT NỐI TIKTOK LIVE THỰC TẾ & HƯỚNG DẪN CÀI ĐẶT -->
+  <div id="conn-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-3">
+    <div class="bg-slate-950 border border-pink-500/50 rounded-xl max-w-xl w-full p-4 sm:p-6 shadow-2xl relative flex flex-col max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h2 class="font-gaming font-bold text-base sm:text-lg text-pink-400 flex items-center gap-2">
+          <span>🔗 KẾT NỐI TIKTOK LIVE REALTIME</span>
+        </h2>
+        <button id="btn-close-modal" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-1">✕</button>
+      </div>
+
+      <div class="mt-4 flex flex-col gap-3 text-xs sm:text-sm text-slate-300">
+        <p>Game hỗ trợ kết nối trực tiếp với phòng phát sóng TikTok Live của bạn thông qua thư viện chuẩn <code class="text-cyan-400 font-mono">@zerodytrash/tiktok-live-connector</code>.</p>
+        
+        <div class="bg-slate-900/90 border border-slate-800 rounded-lg p-3">
+          <label class="block font-bold text-pink-300 mb-1">Tên tài khoản TikTok Live (@username):</label>
+          <div class="flex gap-2">
+            <span class="inline-flex items-center px-2 bg-slate-800 text-slate-400 rounded-l font-mono">@</span>
+            <input id="input-tiktok-username" type="text" placeholder="vd: phuc.gaming, cherry9001..." class="flex-1 px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-r text-white font-mono text-xs focus:border-cyan-400 outline-none">
+            <button id="btn-connect-ws" class="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 font-bold text-white rounded text-xs transition">
+              Kết Nối
+            </button>
+          </div>
+          <div class="mt-2 flex items-center gap-2 text-[11px] text-slate-400">
+            <span>Mật khẩu panel (nếu server đã đặt):</span>
+            <input id="input-panel-key" type="password" placeholder="để trống nếu chưa đặt" class="flex-1 bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-white font-mono text-[11px]">
+          </div>
+          <div class="mt-1 flex items-center gap-2 text-[11px] text-slate-400">
+            <span>WebSocket Server:</span>
+            <input id="input-ws-url" type="text" value="" placeholder="Mặc định: cùng server này (/ws)" class="bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-cyan-300 font-mono text-[11px]">
+          </div>
+        </div>
+
+        <div class="border-t border-slate-800 pt-3">
+          <h3 class="font-bold text-yellow-300 mb-1 flex items-center gap-1.5">
+            <span>💻</span>
+            <span>Hướng dẫn chạy server Node.js TikTok Live Connector:</span>
+          </h3>
+          <p class="text-slate-400 text-xs mb-2">Để game đọc được chat và quà từ TikTok thật, bạn chỉ cần mở Terminal/CMD trên máy tính và chạy 2 lệnh đơn giản sau:</p>
+          <div class="relative bg-slate-900 border border-slate-800 rounded p-2.5 font-mono text-[11px] text-cyan-300 overflow-x-auto">
+            <button id="btn-copy-code" class="absolute top-2 right-2 px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-white rounded text-[10px]">Sao chép code</button>
+            <pre id="server-code-snippet"># 1. Cài thư viện
+npm install tiktok-live-connector ws
+
+# 2. Chạy server nối trực tiếp với TikTok @username của bạn
+node server.js username_cua_ban</pre>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-800 pt-3 flex justify-between items-center">
+          <span class="text-slate-400 text-[11px]">Trạng thái hiện tại: <b id="modal-status-text" class="text-yellow-400">Đang ở chế độ Giả Lập (Demo)</b></span>
+          <button id="btn-switch-demo" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-white text-xs rounded transition">
+            Dùng Chế Độ Demo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN SCRIPT -->
+  <script>
+    /* =========================================================================
+       TIKTOK LIVE CYBER BAR & DANCE CLUB - JAVASCRIPT ENGINE
+       ========================================================================= */
+
+    // --- State & Config ---
+    const CONFIG = {
+      bpm: 128,
+      maxDancers: 40,
+      feverDuration: 15000,
+      feverHypeThreshold: 1000,
+    };
+
+    const STATE = {
+      dancers: new Map(), // username -> Dancer object
+      likesCount: 0,
+      giftsCount: 0,
+      totalCoins: 0,
+      hypeScore: 0,
+      isFever: false,
+      feverEndTime: 0,
+      isAutoDemo: true,
+      isOBSClean: false,
+      audioMuted: false,
+      activeTab: 'leaderboard',
+      ws: null,
+      wsConnected: false,
+      tiktokUsername: '',
+    };
+
+    // Realistic human skin, hair & clubwear palettes
+    const PALETTES = [
+      { hair: '#1e1b2e', hairHi: '#ec4899', body: '#e11d48', jacket: '#0f172a', pants: '#1e293b', shoe: '#38bdf8', skin: '#ffe0cc', skinShadow: '#e6b396', gender: 'female', hairStyle: 'long_wave', outfit: 'crop_jacket' },
+      { hair: '#271c19', hairHi: '#06b6d4', body: '#2563eb', jacket: '#18181b', pants: '#0f172a', shoe: '#f43f5e', skin: '#ffdbb8', skinShadow: '#dfa878', gender: 'male', hairStyle: 'undercut', outfit: 'street_hoodie' },
+      { hair: '#f59e0b', hairHi: '#fef08a', body: '#9333ea', jacket: '#3b0764', pants: '#1e1b4b', shoe: '#eab308', skin: '#ffe5d4', skinShadow: '#e2b49a', gender: 'female', hairStyle: 'ponytail', outfit: 'neon_dress' },
+      { hair: '#0f172a', hairHi: '#a855f7', body: '#10b981', jacket: '#064e3b', pants: '#111827', shoe: '#10b981', skin: '#f7cfa0', skinShadow: '#d19f68', gender: 'male', hairStyle: 'spiky', outfit: 'cyber_vest' },
+      { hair: '#be123c', hairHi: '#fb7185', body: '#f43f5e', jacket: '#1f2937', pants: '#090d16', shoe: '#ec4899', skin: '#ffe4d6', skinShadow: '#e0b098', gender: 'female', hairStyle: 'twin_buns', outfit: 'crop_jacket' },
+      { hair: '#e2e8f0', hairHi: '#38bdf8', body: '#06b6d4', jacket: '#0f172a', pants: '#1e293b', shoe: '#a855f7', skin: '#ffdfc4', skinShadow: '#dba984', gender: 'male', hairStyle: 'kpop_part', outfit: 'street_hoodie' }
+    ];
+
+    const DANCE_STYLES = [
+      { id: 'shuffle', name: 'Melbourne Shuffle 🔥' },
+      { id: 'kpop', name: 'K-Pop Idol Solo ✨' },
+      { id: 'hiphop', name: 'Hip-Hop Street Bounce 🎧' },
+      { id: 'electro', name: 'Cyber Electro Wave ⚡' },
+      { id: 'breakdance', name: 'B-Boy Toprock & Spin 🌪️' }
+    ];
+
+    // Dynamic Spotlight Camera System (Zooms in when someone sends coins/gifts)
+    const CAMERA = {
+      x: 0,
+      y: 0,
+      zoom: 1.0,
+      targetX: 0,
+      targetY: 0,
+      targetZoom: 1.0,
+      activeDancer: null,
+      zoomEndTime: 0,
+      giftLabel: '',
+      coinsSent: 0,
+      soloParticles: []
+    };
+
+    function triggerCameraSpotlight(dancer, giftName = 'Quà VIP', coins = 100) {
+      if (!dancer) return;
+      CAMERA.activeDancer = dancer;
+      // Duration scales with gift value (4.5s to 8s)
+      const duration = coins >= 1000 ? 7500 : (coins >= 99 ? 5800 : 4500);
+      CAMERA.zoomEndTime = Date.now() + duration;
+      CAMERA.targetZoom = coins >= 1000 ? 2.55 : 2.25;
+      CAMERA.giftLabel = `${giftName} (+${coins.toLocaleString()} Xu)`;
+      CAMERA.coinsSent = coins;
+
+      // Pick a stylish solo dance routine for the dancer
+      const styleObj = DANCE_STYLES[Math.floor(Math.random() * DANCE_STYLES.length)];
+      dancer.danceStyle = styleObj.id;
+      dancer.danceStyleName = styleObj.name;
+      dancer.soloUntil = CAMERA.zoomEndTime;
+      dancer.soloStartTime = Date.now();
+
+      // Update Spotlight HUD
+      const hud = document.getElementById('spotlight-hud');
+      if (hud) {
+        document.getElementById('spotlight-dancer-name').innerText = dancer.nickname || dancer.username;
+        document.getElementById('spotlight-gift-info').innerText = `🎁 Tặng ${giftName} (+${coins.toLocaleString()} Xu)`;
+        document.getElementById('spotlight-dance-style').innerText = `🕺 Vũ đạo: ${styleObj.name}`;
+        hud.classList.remove('opacity-0', 'translate-y-[-10px]');
+        hud.classList.add('opacity-100', 'translate-y-0');
+      }
+
+      // Spawn burst of golden coins & sparkles around the dancer
+      const pos = getDancerScreenPos(dancer);
+      for (let i = 0; i < 28; i++) {
+        const ang = (Math.PI * 2 / 28) * i + Math.random() * 0.3;
+        const spd = 1.5 + Math.random() * 4.5;
+        CAMERA.soloParticles.push({
+          x: pos.x,
+          y: pos.y - 35 * pos.scale,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd - 2.5,
+          size: 5 + Math.random() * 6,
+          color: ['#fde047', '#f43f5e', '#38bdf8', '#c084fc', '#4ade80'][i % 5],
+          type: i % 3 === 0 ? 'coin' : 'star',
+          alpha: 1.0,
+          rot: Math.random() * Math.PI
+        });
+      }
+    }
+
+    // --- Canvas & Rendering Setup ---
+    const clubCanvas = document.getElementById('club-canvas');
+    const ctx = clubCanvas.getContext('2d');
+    const fxCanvas = document.getElementById('fx-canvas');
+    const fxCtx = fxCanvas.getContext('2d');
+
+    let cw = 0, ch = 0;
+    function resizeCanvas() {
+      const container = document.getElementById('canvas-container');
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cw = container.clientWidth;
+      ch = container.clientHeight;
+      
+      clubCanvas.width = cw * dpr;
+      clubCanvas.height = ch * dpr;
+      fxCanvas.width = cw * dpr;
+      fxCanvas.height = ch * dpr;
+
+      ctx.resetTransform();
+      ctx.scale(dpr, dpr);
+      fxCtx.resetTransform();
+      fxCtx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    // --- Web Audio Synthesizer (BPM Synchronized EDM Dance Beats & SFX) ---
+    let audioCtx = null;
+    let nextNoteTime = 0;
+    let beatStep = 0;
+    let audioTimer = null;
+
+    function initAudio() {
+      if (audioCtx) return;
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+      audioCtx = new AudioContextClass();
+      nextNoteTime = audioCtx.currentTime + 0.1;
+      scheduleBeat();
+    }
+
+    function scheduleBeat() {
+      if (!audioCtx) return;
+      const secondsPerBeat = 60.0 / (STATE.isFever ? CONFIG.bpm * 1.15 : CONFIG.bpm);
+      const stepTime = secondsPerBeat / 4; // 16th notes
+
+      while (nextNoteTime < audioCtx.currentTime + 0.15) {
+        if (!STATE.audioMuted) {
+          playDrumStep(beatStep, nextNoteTime);
+        }
+        nextNoteTime += stepTime;
+        beatStep = (beatStep + 1) % 16;
+      }
+      audioTimer = requestAnimationFrame(scheduleBeat);
+    }
+
+    function playDrumStep(step, time) {
+      if (!audioCtx) return;
+
+      // 1. Kick on 0, 4, 8, 12 (4-on-the-floor)
+      if (step % 4 === 0) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(140, time);
+        osc.frequency.exponentialRampToValueAtTime(35, time + 0.09);
+        gain.gain.setValueAtTime(0.7, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(time);
+        osc.stop(time + 0.19);
+      }
+
+      // 2. Offbeat Hi-hat on 2, 6, 10, 14
+      if (step % 4 === 2) {
+        playNoiseHiHat(time, 0.06, 0.15);
+      } else if (step % 2 === 1) {
+        playNoiseHiHat(time, 0.02, 0.05); // light 16th hi-hat
+      }
+
+      // 3. Snare / Clap on 4, 12
+      if (step === 4 || step === 12) {
+        playSnare(time);
+      }
+
+      // 4. Bassline arpeggio
+      if (step % 2 === 0) {
+        const bassFreqs = [55, 55, 65.41, 73.42, 55, 49, 65.41, 82.41]; // A1, C2, D2, G1...
+        const freq = bassFreqs[(Math.floor(step / 2)) % bassFreqs.length];
+        playSynthBass(time, freq, 0.1);
+      }
+    }
+
+    function playNoiseHiHat(time, duration, volume) {
+      const bufferSize = audioCtx.sampleRate * duration;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = 7500;
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(volume, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+      noise.start(time);
+      noise.stop(time + duration);
+    }
+
+    function playSnare(time) {
+      // Noise component
+      playNoiseHiHat(time, 0.18, 0.28);
+      // Tone body
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.setValueAtTime(200, time);
+      osc.frequency.exponentialRampToValueAtTime(80, time + 0.1);
+      gain.gain.setValueAtTime(0.3, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(time);
+      osc.stop(time + 0.13);
+    }
+
+    function playSynthBass(time, freq, duration) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, time);
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(STATE.isFever ? 1800 : 800, time);
+      gain.gain.setValueAtTime(0.2, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(time);
+      osc.stop(time + duration);
+    }
+
+    // Sound FX: DJ Scratch, Airhorn, Champagne Pop, Coin Chime, Lion Roar
+    function playSFX(type) {
+      if (!audioCtx || STATE.audioMuted) return;
+      const t = audioCtx.currentTime;
+
+      if (type === 'scratch') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(400, t);
+        osc.frequency.linearRampToValueAtTime(1400, t + 0.08);
+        osc.frequency.linearRampToValueAtTime(250, t + 0.18);
+        gain.gain.setValueAtTime(0.35, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t);
+        osc.stop(t + 0.22);
+      } else if (type === 'airhorn') {
+        // Reggae / DJ Airhorn (multi-oscillator chord)
+        const freqs = [466.16, 466.16, 554.37, 698.46]; // Bb4, C#5, F5
+        freqs.forEach(f => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(f, t);
+          gain.gain.setValueAtTime(0.12, t);
+          gain.gain.setValueAtTime(0.12, t + 0.15);
+          gain.gain.linearRampToValueAtTime(0.01, t + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(t);
+          osc.stop(t + 0.36);
+        });
+      } else if (type === 'coin') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(987.77, t); // B5
+        osc.frequency.setValueAtTime(1318.51, t + 0.07); // E6
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.35);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t);
+        osc.stop(t + 0.36);
+      } else if (type === 'pop') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(180, t);
+        osc.frequency.exponentialRampToValueAtTime(40, t + 0.08);
+        gain.gain.setValueAtTime(0.6, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t);
+        osc.stop(t + 0.16);
+      } else if (type === 'roar') {
+        // Rumble lion roar
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(95, t);
+        osc.frequency.exponentialRampToValueAtTime(45, t + 0.8);
+        gain.gain.setValueAtTime(0.4, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.9);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t);
+        osc.stop(t + 0.95);
+      }
+    }
+
+    // --- Dancer Model ---
+    class Dancer {
+      constructor(username, nickname = '') {
+        this.username = username;
+        this.nickname = nickname || username;
+        this.id = Math.random().toString(36).substring(2, 9);
+        this.palette = PALETTES[Math.floor(Math.random() * PALETTES.length)];
+        
+        // Position on 2.5D floor
+        this.gridX = 0.2 + Math.random() * 0.6; // normalized 0..1
+        this.gridY = 0.35 + Math.random() * 0.55; // depth
+        this.targetGridX = this.gridX;
+        this.targetGridY = this.gridY;
+
+        // Visual properties
+        this.scale = 1.0;
+        this.targetScale = 1.0;
+        this.rotation = 0;
+        this.targetRotation = 0;
+        this.spinVelocity = 0;
+        this.jumpOffset = 0;
+        this.jumpVelocity = 0;
+
+        // Custom gear & items
+        this.hasGlasses = false;
+        this.hasCap = false;
+        this.hasCrown = false;
+        this.hasGlowAura = false;
+        this.glowColor = '#ec4899';
+        this.auraUntil = 0;
+
+        // Action state
+        this.action = 'dance'; // 'dance', 'drink', 'jump', 'spin', 'cheers'
+        this.actionLabel = '';
+        this.actionLabelUntil = 0;
+
+        // Chat bubble
+        this.chatMessage = '';
+        this.chatUntil = 0;
+
+        // Stats & Solo Dance Choreography
+        this.totalCoins = 0;
+        this.totalGifts = 0;
+        this.lastActiveTime = Date.now();
+        this.animPhase = Math.random() * Math.PI * 2;
+        const initStyle = DANCE_STYLES[Math.floor(Math.random() * DANCE_STYLES.length)];
+        this.danceStyle = initStyle.id;
+        this.danceStyleName = initStyle.name;
+        this.soloUntil = 0;
+        this.soloStartTime = 0;
+        this.blinkTimer = Math.random() * 100;
+        this.afterimages = [];
+      }
+
+      say(message) {
+        this.chatMessage = message;
+        this.chatUntil = Date.now() + 4500;
+        this.lastActiveTime = Date.now();
+      }
+
+      setAction(actionName, label = '', duration = 3000) {
+        this.action = actionName;
+        if (label) {
+          this.actionLabel = label;
+          this.actionLabelUntil = Date.now() + duration;
+        }
+        this.lastActiveTime = Date.now();
+      }
+
+      spin() {
+        this.spinVelocity = 0.45;
+        this.setAction('spin', '🔄 XOAY 360°', 2000);
+      }
+
+      jump() {
+        this.jumpVelocity = -12;
+        this.setAction('jump', '🦘 NHẢY CỰC SUNG', 2000);
+      }
+
+      applyGift(giftType, coins) {
+        this.totalCoins += coins;
+        this.totalGifts += 1;
+        this.lastActiveTime = Date.now();
+
+        if (giftType === 'rose') {
+          this.spin();
+          this.hasGlowAura = true;
+          this.glowColor = '#f43f5e';
+          this.auraUntil = Date.now() + 8000;
+        } else if (giftType === 'heart') {
+          this.jump();
+          this.hasGlowAura = true;
+          this.glowColor = '#ec4899';
+          this.auraUntil = Date.now() + 10000;
+        } else if (giftType === 'cap') {
+          this.hasGlasses = true;
+          this.hasCap = true;
+          this.targetScale = Math.min(this.targetScale + 0.15, 1.8);
+          this.setAction('dance', '🕶️ PHONG CÁCH VIP', 4000);
+        } else if (giftType === 'champagne') {
+          this.hasGlowAura = true;
+          this.glowColor = '#eab308';
+          this.auraUntil = Date.now() + 15000;
+          this.targetScale = Math.min(this.targetScale + 0.25, 2.0);
+          this.setAction('cheers', '🍾 KHUI SÂM PANH', 5000);
+        } else if (giftType === 'fireworks') {
+          this.hasCrown = true;
+          this.hasGlowAura = true;
+          this.glowColor = '#06b6d4';
+          this.auraUntil = Date.now() + 20000;
+          this.targetScale = Math.min(this.targetScale + 0.35, 2.2);
+          this.setAction('jump', '🎆 ĐẠI GIA PHÁO HOA', 6000);
+        } else if (giftType === 'galaxy') {
+          this.hasCrown = true;
+          this.hasGlowAura = true;
+          this.glowColor = '#a855f7';
+          this.auraUntil = Date.now() + 30000;
+          this.targetScale = Math.min(this.targetScale + 0.45, 2.4);
+          this.setAction('dance', '🌌 CHỦ PHÒNG VŨ TRỤ', 7000);
+        } else if (giftType === 'lion') {
+          this.hasCrown = true;
+          this.hasGlasses = true;
+          this.hasCap = true;
+          this.hasGlowAura = true;
+          this.glowColor = '#f59e0b';
+          this.auraUntil = Date.now() + 45000;
+          this.targetScale = 2.6;
+          this.gridX = 0.5; // Jump directly to center stage!
+          this.gridY = 0.55;
+          this.setAction('dance', '🦁 VUA SÀN NHẢY', 10000);
+        }
+      }
+
+      update(dt) {
+        // Move towards target position smoothly
+        this.gridX += (this.targetGridX - this.gridX) * 0.05;
+        this.gridY += (this.targetGridY - this.gridY) * 0.05;
+
+        // Smooth scale
+        this.scale += (this.targetScale - this.scale) * 0.08;
+
+        // Spin update
+        if (this.spinVelocity > 0.01) {
+          this.rotation += this.spinVelocity;
+          this.spinVelocity *= 0.94;
+          if (this.spinVelocity <= 0.01) {
+            this.rotation = 0;
+            this.spinVelocity = 0;
+          }
+        }
+
+        // Jump physics
+        if (this.jumpVelocity !== 0 || this.jumpOffset !== 0) {
+          this.jumpOffset += this.jumpVelocity;
+          this.jumpVelocity += 0.8; // gravity
+          if (this.jumpOffset >= 0) {
+            this.jumpOffset = 0;
+            this.jumpVelocity = 0;
+          }
+        }
+
+        // Random wander occasionally
+        if (Math.random() < 0.003 && this.action !== 'drink') {
+          this.targetGridX = Math.max(0.12, Math.min(0.88, this.gridX + (Math.random() - 0.5) * 0.25));
+          this.targetGridY = Math.max(0.32, Math.min(0.88, this.gridY + (Math.random() - 0.5) * 0.2));
+        }
+
+        // Check aura expiration
+        if (this.hasGlowAura && Date.now() > this.auraUntil) {
+          this.hasGlowAura = false;
+        }
+      }
+    }
+
+    // --- Visual Particles & FX Systems ---
+    const hearts = [];
+    const confetti = [];
+    const fireworks = [];
+    const lasers = [];
+    const smokeParticles = [];
+    let discoAngle = 0;
+    let djAnimFrame = 0;
+
+    // Laser setup
+    for (let i = 0; i < 6; i++) {
+      lasers.push({
+        baseX: (i / 5),
+        angle: (i - 2.5) * 0.3,
+        speed: 0.02 + Math.random() * 0.02,
+        color: ['#f43f5e', '#06b6d4', '#a855f7', '#eab308', '#10b981', '#ec4899'][i],
+        width: 3
+      });
+    }
+
+    function spawnHeart(x, y, count = 1) {
+      for (let i = 0; i < count; i++) {
+        hearts.push({
+          x: x || (cw * 0.3 + Math.random() * cw * 0.4),
+          y: y || (ch - 20),
+          vx: (Math.random() - 0.5) * 2,
+          vy: -3 - Math.random() * 4,
+          size: 14 + Math.random() * 12,
+          color: ['#f43f5e', '#ec4899', '#fb7185', '#fda4af'][Math.floor(Math.random() * 4)],
+          alpha: 1,
+          rot: (Math.random() - 0.5) * 0.4
+        });
+      }
+    }
+
+    function spawnConfetti(count = 60) {
+      for (let i = 0; i < count; i++) {
+        confetti.push({
+          x: cw * 0.5 + (Math.random() - 0.5) * cw * 0.6,
+          y: ch * 0.15,
+          vx: (Math.random() - 0.5) * 10,
+          vy: -2 + Math.random() * 7,
+          color: ['#ec4899', '#06b6d4', '#eab308', '#a855f7', '#10b981', '#f43f5e'][Math.floor(Math.random() * 6)],
+          size: 6 + Math.random() * 6,
+          rot: Math.random() * Math.PI,
+          vRot: (Math.random() - 0.5) * 0.2,
+          alpha: 1
+        });
+      }
+    }
+
+    function spawnFirework(targetX, targetY) {
+      const colors = ['#f43f5e', '#06b6d4', '#f59e0b', '#a855f7', '#10b981', '#ffffff'];
+      const fireworkColor = colors[Math.floor(Math.random() * colors.length)];
+      for (let i = 0; i < 45; i++) {
+        const angle = (Math.PI * 2 / 45) * i;
+        const speed = 2 + Math.random() * 6;
+        fireworks.push({
+          x: targetX,
+          y: targetY,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          color: fireworkColor,
+          size: 3 + Math.random() * 3,
+          alpha: 1,
+          decay: 0.015 + Math.random() * 0.01
+        });
+      }
+      playSFX('pop');
+    }
+
+    // --- Special Fullscreen Animation Effects ---
+    let specialFX = null; // { type: 'galaxy'|'lion'|'champagne', timer: 0, maxTimer: 180, ... }
+
+    function triggerSpecialFX(type, gifterName) {
+      specialFX = {
+        type: type,
+        gifterName: gifterName,
+        frame: 0,
+        maxFrames: type === 'lion' ? 240 : 180,
+      };
+      if (type === 'lion') {
+        playSFX('roar');
+        playSFX('airhorn');
+      } else if (type === 'champagne') {
+        playSFX('pop');
+        spawnConfetti(70);
+      } else if (type === 'galaxy') {
+        playSFX('coin');
+      }
+    }
+
+    // --- Main Game Loop & Renderer ---
+    let lastTime = performance.now();
+    let beatTime = 0;
+
+    function renderLoop(now) {
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+      beatTime = (now / 1000) * (CONFIG.bpm / 60) * Math.PI; // Beat pulse phase
+
+      // Check Fever status
+      if (STATE.isFever && Date.now() > STATE.feverEndTime) {
+        STATE.isFever = false;
+        document.getElementById('fever-overlay').style.opacity = '0';
+        document.getElementById('fever-text').style.opacity = '0';
+      }
+
+      // Update dancers
+      STATE.dancers.forEach(dancer => dancer.update(dt));
+
+      // Clear & Draw Nightclub
+      drawNightClubScene();
+
+      // Render FX Canvas (Fireworks, Galaxy, Lion)
+      renderSpecialFXLayer();
+
+      requestAnimationFrame(renderLoop);
+    }
+
+    // --- Update Camera Zoom & Spotlight Tracking ---
+    function updateCamera() {
+      const now = Date.now();
+      if (CAMERA.activeDancer && now < CAMERA.zoomEndTime && STATE.dancers.has(CAMERA.activeDancer.username)) {
+        const pos = getDancerScreenPos(CAMERA.activeDancer);
+        // Focus on upper body / full body center of the dancing character
+        CAMERA.targetX = pos.x;
+        CAMERA.targetY = pos.y - 38 * pos.scale;
+      } else {
+        if (CAMERA.activeDancer && now >= CAMERA.zoomEndTime) {
+          CAMERA.activeDancer = null;
+          CAMERA.targetZoom = 1.0;
+          const hud = document.getElementById('spotlight-hud');
+          if (hud) {
+            hud.classList.remove('opacity-100', 'translate-y-0');
+            hud.classList.add('opacity-0', 'translate-y-[-10px]');
+          }
+        }
+        CAMERA.targetX = cw * 0.5;
+        CAMERA.targetY = ch * 0.5;
+        CAMERA.targetZoom = 1.0;
+      }
+
+      // Smooth spring damping
+      CAMERA.zoom += (CAMERA.targetZoom - CAMERA.zoom) * 0.08;
+      CAMERA.x += (CAMERA.targetX - CAMERA.x) * 0.09;
+      CAMERA.y += (CAMERA.targetY - CAMERA.y) * 0.09;
+    }
+
+    // --- Draw the Nightclub Environment ---
+    function drawNightClubScene() {
+      updateCamera();
+      ctx.clearRect(0, 0, cw, ch);
+
+      ctx.save();
+      // Apply Dynamic Camera Zoom & Pan
+      if (Math.abs(CAMERA.zoom - 1.0) > 0.005) {
+        ctx.translate(cw * 0.5, ch * 0.52);
+        ctx.scale(CAMERA.zoom, CAMERA.zoom);
+        ctx.translate(-CAMERA.x, -CAMERA.y);
+      }
+
+      // 1. Background gradient (Nightclub Walls & Stage)
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, ch);
+      bgGrad.addColorStop(0, '#04040d');
+      bgGrad.addColorStop(0.35, '#0b0c20');
+      bgGrad.addColorStop(1, '#020308');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(-cw * 0.5, -ch * 0.5, cw * 2, ch * 2);
+
+      // 2. Animated Lasers
+      drawLasers();
+
+      // 3. DJ Stage & Booth (Top Center)
+      drawDJStage();
+
+      // 4. VIP Lounges (Left & Right Counters)
+      drawVIPLounges();
+
+      // 5. Perspective Dance Floor with Pulsing Neon Tiles
+      drawDanceFloorGrid();
+
+      // 6. Disco Ball & Light Rays
+      drawDiscoBall();
+
+      // 6.5 If Spotlight Camera is active, dim background slightly so VIP dancer pops!
+      const isSpotlighting = CAMERA.activeDancer && Date.now() < CAMERA.zoomEndTime;
+      if (isSpotlighting) {
+        ctx.fillStyle = 'rgba(3, 4, 12, 0.52)';
+        ctx.fillRect(-cw * 0.5, -ch * 0.5, cw * 2, ch * 2);
+      }
+
+      // 7. Sort & Render Dancers (Back to Front based on gridY)
+      const sortedDancers = Array.from(STATE.dancers.values()).sort((a, b) => a.gridY - b.gridY);
+      sortedDancers.forEach(dancer => {
+        if (isSpotlighting && dancer === CAMERA.activeDancer) {
+          drawVIPSpotlightBeam(dancer);
+        }
+        drawDancerAvatar(dancer);
+      });
+
+      // 7.5 Render Solo Spotlight Coins & Sparkles
+      drawSoloSpotlightParticles();
+
+      // 8. Render Floating Particles (Hearts & Confetti)
+      drawParticles();
+
+      ctx.restore();
+
+      // 9. Foreground Smoke & Club Vignette (Screen-space)
+      drawSmokeAndVignette();
+    }
+
+    function drawVIPSpotlightBeam(dancer) {
+      const pos = getDancerScreenPos(dancer);
+      const s = pos.scale;
+      ctx.save();
+      // Overhead light cone
+      const coneGrad = ctx.createLinearGradient(pos.x, pos.y - 260 * s, pos.x, pos.y + 20 * s);
+      coneGrad.addColorStop(0, 'rgba(244, 63, 94, 0.0)');
+      coneGrad.addColorStop(0.3, 'rgba(236, 72, 153, 0.18)');
+      coneGrad.addColorStop(0.7, 'rgba(56, 189, 248, 0.25)');
+      coneGrad.addColorStop(1, 'rgba(250, 204, 21, 0.38)');
+      ctx.fillStyle = coneGrad;
+      ctx.beginPath();
+      ctx.moveTo(pos.x - 18 * s, pos.y - 260 * s);
+      ctx.lineTo(pos.x + 18 * s, pos.y - 260 * s);
+      ctx.lineTo(pos.x + 68 * s, pos.y + 18 * s);
+      ctx.lineTo(pos.x - 68 * s, pos.y + 18 * s);
+      ctx.closePath();
+      ctx.fill();
+
+      // Rotating magic stage rings on floor
+      const rot = performance.now() * 0.004;
+      ctx.translate(pos.x, pos.y + 6 * s);
+      ctx.scale(1, 0.38);
+      ctx.rotate(rot);
+      ctx.strokeStyle = '#fde047';
+      ctx.lineWidth = 3 * s;
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 15;
+      ctx.setLineDash([12 * s, 8 * s]);
+      ctx.beginPath();
+      ctx.arc(0, 0, 52 * s, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.rotate(-rot * 2);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2 * s;
+      ctx.beginPath();
+      ctx.arc(0, 0, 38 * s, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+
+    function drawSoloSpotlightParticles() {
+      for (let i = CAMERA.soloParticles.length - 1; i >= 0; i--) {
+        const p = CAMERA.soloParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.08; // light gravity
+        p.rot += 0.1;
+        p.alpha -= 0.014;
+        if (p.alpha <= 0) {
+          CAMERA.soloParticles.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        if (p.type === 'coin') {
+          ctx.fillStyle = '#fde047';
+          ctx.strokeStyle = '#d97706';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size * 0.7, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = '#b45309';
+          ctx.font = `bold ${Math.floor(p.size * 0.9)}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('¥', 0, 0.5);
+        } else {
+          ctx.fillStyle = p.color;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 8;
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size * 0.45, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    // Draw Lasers
+    function drawLasers() {
+      lasers.forEach(laser => {
+        laser.angle += laser.speed * (STATE.isFever ? 2.5 : 1.0);
+        const originX = cw * (0.2 + laser.baseX * 0.6);
+        const originY = ch * 0.18;
+        const targetX = cw * 0.5 + Math.sin(laser.angle) * cw * 0.6;
+        const targetY = ch * 0.85;
+
+        ctx.save();
+        ctx.strokeStyle = laser.color;
+        ctx.lineWidth = STATE.isFever ? 4 : 2;
+        ctx.globalAlpha = 0.35 + Math.sin(beatTime * 2) * 0.15;
+        ctx.shadowColor = laser.color;
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.moveTo(originX, originY);
+        ctx.lineTo(targetX, targetY);
+        ctx.stroke();
+        ctx.restore();
+      });
+    }
+
+    // Draw DJ Stage & Booth
+    function drawDJStage() {
+      const stageW = cw * 0.46;
+      const stageH = ch * 0.22;
+      const stageX = (cw - stageW) / 2;
+      const stageY = ch * 0.12;
+
+      // Stage backdrop glowing arch
+      ctx.save();
+      const archGrad = ctx.createLinearGradient(stageX, stageY, stageX + stageW, stageY);
+      archGrad.addColorStop(0, '#f43f5e');
+      archGrad.addColorStop(0.5, '#a855f7');
+      archGrad.addColorStop(1, '#06b6d4');
+      ctx.strokeStyle = archGrad;
+      ctx.lineWidth = 4;
+      ctx.shadowColor = '#a855f7';
+      ctx.shadowBlur = 15;
+      ctx.beginPath();
+      ctx.roundRect(stageX, stageY, stageW, stageH, [16, 16, 0, 0]);
+      ctx.stroke();
+
+      // Stage backdrop screen (Equalizer LED Bars)
+      ctx.fillStyle = 'rgba(8, 10, 28, 0.85)';
+      ctx.fillRect(stageX, stageY, stageW, stageH);
+
+      // Draw Equalizer Bars
+      const numBars = 16;
+      const barW = (stageW - 40) / numBars;
+      for (let i = 0; i < numBars; i++) {
+        const barHeightMax = stageH * 0.55;
+        // Audio beat reactive height
+        const barH = 8 + Math.abs(Math.sin(beatTime * 3 + i * 0.5)) * barHeightMax;
+        const bx = stageX + 20 + i * barW;
+        const by = stageY + stageH * 0.65 - barH;
+
+        const barGrad = ctx.createLinearGradient(bx, by, bx, by + barH);
+        barGrad.addColorStop(0, '#06b6d4');
+        barGrad.addColorStop(0.5, '#a855f7');
+        barGrad.addColorStop(1, '#f43f5e');
+
+        ctx.fillStyle = barGrad;
+        ctx.fillRect(bx, by, barW - 3, barH);
+      }
+
+      // DJ Avatar behind the booth
+      const djCenterX = cw * 0.5;
+      const djHeadY = stageY + stageH * 0.28 + Math.sin(beatTime * 2) * 5;
+      
+      // DJ Headphones & Head
+      ctx.fillStyle = '#ffd1b3';
+      ctx.beginPath();
+      ctx.arc(djCenterX, djHeadY, 14, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sunglasses
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(djCenterX - 11, djHeadY - 3, 22, 6);
+
+      // Neon Cap
+      ctx.fillStyle = '#ec4899';
+      ctx.beginPath();
+      ctx.arc(djCenterX, djHeadY - 6, 15, Math.PI, Math.PI * 2);
+      ctx.fill();
+      ctx.fillRect(djCenterX - 18, djHeadY - 7, 36, 4);
+
+      // DJ Headphones
+      ctx.strokeStyle = '#06b6d4';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(djCenterX, djHeadY, 16, Math.PI * 0.8, Math.PI * 2.2);
+      ctx.stroke();
+      ctx.fillStyle = '#06b6d4';
+      ctx.fillRect(djCenterX - 19, djHeadY - 4, 6, 10);
+      ctx.fillRect(djCenterX + 13, djHeadY - 4, 6, 10);
+
+      // DJ Booth Table
+      const tableY = stageY + stageH * 0.55;
+      const tableH = stageH * 0.45;
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(stageX + 15, tableY, stageW - 30, tableH);
+      ctx.strokeStyle = '#f43f5e';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(stageX + 15, tableY, stageW - 30, tableH);
+
+      // DJ Booth Neon Sign
+      ctx.font = 'bold 12px "Orbitron", sans-serif';
+      ctx.fillStyle = '#f43f5e';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = '#f43f5e';
+      ctx.shadowBlur = 10;
+      ctx.fillText('DJ MASTER BEAT 🎛️', djCenterX, tableY + 22);
+
+      // Vinyl turntables on the table
+      ctx.fillStyle = '#020617';
+      ctx.beginPath();
+      ctx.arc(djCenterX - 45, tableY + 12, 10, 0, Math.PI * 2);
+      ctx.arc(djCenterX + 45, tableY + 12, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // Draw VIP Lounges on sides
+    function drawVIPLounges() {
+      // Left VIP Lounge
+      ctx.save();
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+      ctx.fillRect(0, ch * 0.35, cw * 0.16, ch * 0.45);
+      ctx.strokeStyle = 'rgba(234, 179, 8, 0.4)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(0, ch * 0.35, cw * 0.16, ch * 0.45);
+
+      ctx.font = 'bold 10px "Orbitron", sans-serif';
+      ctx.fillStyle = '#eab308';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = '#eab308';
+      ctx.shadowBlur = 6;
+      ctx.fillText('⭐ VIP BAR ⭐', cw * 0.08, ch * 0.39);
+      ctx.font = '14px sans-serif';
+      ctx.fillText('🍸 🍾 🍹', cw * 0.08, ch * 0.44);
+
+      // Right VIP Lounge
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+      ctx.fillRect(cw * 0.84, ch * 0.35, cw * 0.16, ch * 0.45);
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
+      ctx.strokeRect(cw * 0.84, ch * 0.35, cw * 0.16, ch * 0.45);
+
+      ctx.fillStyle = '#06b6d4';
+      ctx.shadowColor = '#06b6d4';
+      ctx.fillText('✨ LOUNGE ✨', cw * 0.92, ch * 0.39);
+      ctx.fillText('🍷 🍻 🥂', cw * 0.92, ch * 0.44);
+      ctx.restore();
+    }
+
+    // Draw Perspective Dance Floor
+    function drawDanceFloorGrid() {
+      const topW = cw * 0.55;
+      const bottomW = cw * 0.95;
+      const startY = ch * 0.34;
+      const endY = ch * 0.98;
+
+      ctx.save();
+
+      // Floor backdrop polygon
+      ctx.beginPath();
+      ctx.moveTo((cw - topW) / 2, startY);
+      ctx.lineTo((cw + topW) / 2, startY);
+      ctx.lineTo((cw + bottomW) / 2, endY);
+      ctx.lineTo((cw - bottomW) / 2, endY);
+      ctx.closePath();
+      const floorGrad = ctx.createLinearGradient(0, startY, 0, endY);
+      floorGrad.addColorStop(0, '#090a1f');
+      floorGrad.addColorStop(1, '#180b2a');
+      ctx.fillStyle = floorGrad;
+      ctx.fill();
+
+      // Perspective Grid Lines
+      const cols = 8;
+      const rows = 7;
+
+      // Draw rows (horizontal perspective lines)
+      for (let r = 0; r <= rows; r++) {
+        const ratio = r / rows;
+        // Perspective curving
+        const pRatio = Math.pow(ratio, 1.4);
+        const y = startY + (endY - startY) * pRatio;
+        const rowW = topW + (bottomW - topW) * pRatio;
+        const x1 = (cw - rowW) / 2;
+        const x2 = (cw + rowW) / 2;
+
+        ctx.strokeStyle = (r % 2 === 0) ? 'rgba(236, 72, 153, 0.28)' : 'rgba(6, 182, 212, 0.28)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x1, y);
+        ctx.lineTo(x2, y);
+        ctx.stroke();
+      }
+
+      // Draw columns (radial perspective lines)
+      for (let c = 0; c <= cols; c++) {
+        const ratio = c / cols;
+        const topX = (cw - topW) / 2 + topW * ratio;
+        const botX = (cw - bottomW) / 2 + bottomW * ratio;
+
+        ctx.strokeStyle = 'rgba(168, 85, 247, 0.22)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(topX, startY);
+        ctx.lineTo(botX, endY);
+        ctx.stroke();
+      }
+
+      // Draw some pulsing glowing floor tiles on beat
+      for (let i = 0; i < 6; i++) {
+        const tileC = (Math.floor(beatTime * 2 + i * 2)) % cols;
+        const tileR = (Math.floor(beatTime + i * 3)) % rows;
+        drawFloorTile(tileC, tileR, cols, rows, topW, bottomW, startY, endY, i);
+      }
+
+      ctx.restore();
+    }
+
+    function drawFloorTile(c, r, cols, rows, topW, bottomW, startY, endY, index) {
+      const p1 = Math.pow(r / rows, 1.4);
+      const p2 = Math.pow((r + 1) / rows, 1.4);
+      const y1 = startY + (endY - startY) * p1;
+      const y2 = startY + (endY - startY) * p2;
+      const w1 = topW + (bottomW - topW) * p1;
+      const w2 = topW + (bottomW - topW) * p2;
+
+      const x1a = (cw - w1) / 2 + w1 * (c / cols);
+      const x1b = (cw - w1) / 2 + w1 * ((c + 1) / cols);
+      const x2a = (cw - w2) / 2 + w2 * (c / cols);
+      const x2b = (cw - w2) / 2 + w2 * ((c + 1) / cols);
+
+      const colors = ['rgba(244, 63, 94, 0.35)', 'rgba(6, 182, 212, 0.35)', 'rgba(234, 179, 8, 0.35)', 'rgba(168, 85, 247, 0.35)'];
+      ctx.fillStyle = colors[index % colors.length];
+      ctx.beginPath();
+      ctx.moveTo(x1a, y1);
+      ctx.lineTo(x1b, y1);
+      ctx.lineTo(x2b, y2);
+      ctx.lineTo(x2a, y2);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Draw Disco Ball
+    function drawDiscoBall() {
+      const ballX = cw * 0.5;
+      const ballY = ch * 0.08;
+      discoAngle += 0.015 * (STATE.isFever ? 2.5 : 1.0);
+
+      ctx.save();
+      // String
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(ballX, 0);
+      ctx.lineTo(ballX, ballY);
+      ctx.stroke();
+
+      // Mirror reflections (sparkle rays radiating out)
+      for (let i = 0; i < 8; i++) {
+        const rayAngle = discoAngle + (Math.PI * 2 / 8) * i;
+        const rayX = ballX + Math.cos(rayAngle) * cw * 0.45;
+        const rayY = ballY + Math.sin(rayAngle) * ch * 0.35;
+
+        ctx.strokeStyle = (i % 2 === 0) ? 'rgba(255, 255, 255, 0.22)' : 'rgba(236, 72, 153, 0.25)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(ballX, ballY);
+        ctx.lineTo(rayX, rayY);
+        ctx.stroke();
+      }
+
+      // Ball sphere
+      const ballRadius = 22;
+      const grad = ctx.createRadialGradient(ballX - 6, ballY - 6, 2, ballX, ballY, ballRadius);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.4, '#cbd5e1');
+      grad.addColorStop(1, '#475569');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Mirror facets
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      for (let f = 0; f < 5; f++) {
+        const facetX = ballX + Math.sin(discoAngle * 3 + f) * 14;
+        const facetY = ballY + (f - 2) * 6;
+        ctx.fillRect(facetX, facetY, 3, 3);
+      }
+      ctx.restore();
+    }
+
+    // Convert normalized dancer coordinates (gridX: 0..1, gridY: 0..1) to canvas screen coords
+    function getDancerScreenPos(dancer) {
+      const topW = cw * 0.55;
+      const bottomW = cw * 0.95;
+      const startY = ch * 0.35;
+      const endY = ch * 0.94;
+
+      const pRatio = Math.pow(dancer.gridY, 1.3);
+      const screenY = startY + (endY - startY) * pRatio + dancer.jumpOffset;
+      const curFloorW = topW + (bottomW - topW) * pRatio;
+      const screenX = (cw - curFloorW) / 2 + curFloorW * dancer.gridX;
+
+      // Perspective scale factor
+      const perspScale = 0.65 + pRatio * 0.65;
+      return { x: screenX, y: screenY, scale: perspScale * dancer.scale };
+    }
+
+    // Draw Realistic Articulated 3D-Shaded Club Dancer on Floor
+    function drawDancerAvatar(dancer) {
+      const pos = getDancerScreenPos(dancer);
+      const s = pos.scale;
+      const now = Date.now();
+      const isSolo = (dancer.soloUntil > now) || (CAMERA.activeDancer === dancer && now < CAMERA.zoomEndTime);
+      const speedMult = isSolo ? 1.85 : (STATE.isFever ? 1.5 : 1.0);
+      const t = beatTime * speedMult + dancer.animPhase;
+
+      // --- Compute Articulated Skeletal Kinematics per Dance Style ---
+      let hipSwayX = Math.sin(t * 2) * 5 * s;
+      let torsoTilt = Math.sin(t) * 0.08;
+      let bounceY = Math.abs(Math.sin(t * 2)) * -7 * s;
+      let headNod = Math.sin(t * 2 + 0.4) * 0.1;
+      let headTilt = Math.cos(t) * 0.12;
+
+      // Joint angles (radians)
+      let lShoulderA = 0.4 + Math.sin(t * 2) * 0.6;
+      let lElbowA = 0.8 + Math.cos(t * 2) * 0.5;
+      let rShoulderA = -0.4 - Math.sin(t * 2) * 0.6;
+      let rElbowA = -0.8 - Math.cos(t * 2) * 0.5;
+
+      // Foot offsets relative to hip center
+      let lKneeX = -7 * s, lKneeY = 20 * s;
+      let rKneeX = 7 * s, rKneeY = 20 * s;
+      let lFootX = -8 * s, lFootY = 38 * s;
+      let rFootX = 8 * s, rFootY = 38 * s;
+
+      const style = dancer.danceStyle || 'shuffle';
+      if (isSolo || dancer.action === 'dance') {
+        if (style === 'shuffle') {
+          // Melbourne Shuffle: fast running-man & T-step leg slides + energetic arm pumps
+          const step = Math.sin(t * 3.2);
+          const stepCos = Math.cos(t * 3.2);
+          hipSwayX = step * 8 * s;
+          bounceY = Math.abs(stepCos) * -10 * s;
+          torsoTilt = step * 0.12;
+          lFootX = (-10 + step * 14) * s;
+          lFootY = (37 - Math.max(0, stepCos) * 11) * s;
+          rFootX = (10 - step * 14) * s;
+          rFootY = (37 - Math.max(0, -stepCos) * 11) * s;
+          lKneeX = (-8 + step * 9) * s;
+          lKneeY = (19 - Math.max(0, stepCos) * 7) * s;
+          rKneeX = (8 - step * 9) * s;
+          rKneeY = (19 - Math.max(0, -stepCos) * 7) * s;
+          lShoulderA = 0.6 + step * 1.1;
+          lElbowA = 1.2 + stepCos * 0.6;
+          rShoulderA = -0.6 + step * 1.1;
+          rElbowA = -1.2 + stepCos * 0.6;
+        } else if (style === 'kpop') {
+          // K-Pop Idol Choreography: stylish hip isolation, point-dance hands near face/chest
+          const wave = Math.sin(t * 2.5);
+          hipSwayX = wave * 9 * s;
+          torsoTilt = -wave * 0.16;
+          headTilt = wave * 0.22;
+          bounceY = Math.sin(t * 5) * -4.5 * s;
+          lShoulderA = 1.3 + Math.sin(t * 2.5) * 0.8;
+          lElbowA = 1.5 + Math.cos(t * 2.5) * 0.5;
+          rShoulderA = -1.4 + Math.cos(t * 2.5) * 0.7;
+          rElbowA = -1.3 - Math.sin(t * 2.5) * 0.6;
+          lKneeX = (-6 + wave * 5) * s;
+          rKneeX = (6 + wave * 5) * s;
+          lFootX = (-9 + Math.max(0, wave) * 6) * s;
+          rFootX = (9 + Math.min(0, wave) * 6) * s;
+          lFootY = (38 - Math.max(0, -wave) * 7) * s;
+          rFootY = (38 - Math.max(0, wave) * 7) * s;
+        } else if (style === 'hiphop') {
+          // Hip-Hop Bounce: deep knee bend, wide stance, cross-body groove
+          const groove = Math.sin(t * 2.2);
+          bounceY = Math.abs(groove) * 6 * s - 4 * s;
+          hipSwayX = groove * 7 * s;
+          torsoTilt = groove * 0.18;
+          headNod = Math.abs(groove) * 0.22;
+          lKneeX = (-13 + groove * 4) * s;
+          rKneeX = (13 + groove * 4) * s;
+          lFootX = -14 * s;
+          rFootX = 14 * s;
+          lFootY = (38 - Math.max(0, groove) * 6) * s;
+          rFootY = (38 - Math.max(0, -groove) * 6) * s;
+          lShoulderA = 0.8 + groove * 0.9;
+          lElbowA = 1.4;
+          rShoulderA = -0.8 + groove * 0.9;
+          rElbowA = -1.4;
+        } else if (style === 'electro') {
+          // Cyber Electro Wave: overhead arm waves & liquid torso roll
+          const roll = Math.sin(t * 3.0);
+          hipSwayX = Math.cos(t * 3.0) * 8 * s;
+          torsoTilt = roll * 0.2;
+          bounceY = Math.abs(roll) * -8 * s;
+          lShoulderA = 2.1 + Math.sin(t * 3.0) * 0.6;
+          lElbowA = 0.7 + Math.cos(t * 3.0) * 0.8;
+          rShoulderA = -2.1 + Math.cos(t * 3.0) * 0.6;
+          rElbowA = -0.7 - Math.sin(t * 3.0) * 0.8;
+          lFootX = (-8 - roll * 7) * s;
+          rFootX = (8 - roll * 7) * s;
+        } else {
+          // B-Boy Toprock & Flair
+          const rock = Math.sin(t * 3.0);
+          hipSwayX = -rock * 9 * s;
+          torsoTilt = rock * 0.24;
+          bounceY = Math.abs(Math.cos(t * 3.0)) * -11 * s;
+          lShoulderA = 1.6 + rock * 0.9;
+          rShoulderA = -1.6 + rock * 0.9;
+          lElbowA = 0.8;
+          rElbowA = -0.8;
+          lFootX = (-11 + rock * 12) * s;
+          rFootX = (11 + rock * 12) * s;
+          lFootY = (37 - Math.max(0, rock) * 10) * s;
+          rFootY = (37 - Math.max(0, -rock) * 10) * s;
+        }
+      }
+
+      if (dancer.action === 'cheers' || dancer.action === 'jump') {
+        lShoulderA = 2.4 + Math.sin(t * 4) * 0.25;
+        rShoulderA = -2.4 - Math.sin(t * 4) * 0.25;
+        lElbowA = 0.4;
+        rElbowA = -0.4;
+      }
+
+      ctx.save();
+      ctx.translate(pos.x, pos.y);
+
+      // 1. Realistic Glossy Floor Shadow & Neon Ground Reflection
+      const shadowGrad = ctx.createRadialGradient(0, 38 * s, 2 * s, 0, 38 * s, 28 * s);
+      shadowGrad.addColorStop(0, 'rgba(0, 0, 0, 0.65)');
+      shadowGrad.addColorStop(0.6, isSolo ? 'rgba(236, 72, 153, 0.28)' : 'rgba(0, 0, 0, 0.25)');
+      shadowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = shadowGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, 38 * s, 26 * s, 9 * s, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Spotlight / Glow Aura Ring on Floor
+      if (dancer.hasGlowAura || dancer.hasCrown || isSolo) {
+        ctx.save();
+        const ringColor = isSolo ? '#fde047' : dancer.glowColor;
+        ctx.shadowColor = ringColor;
+        ctx.shadowBlur = 20;
+        ctx.strokeStyle = ringColor;
+        ctx.lineWidth = (isSolo ? 3 : 2) * s;
+        ctx.beginPath();
+        ctx.ellipse(0, 38 * s, 28 * s, 9.5 * s, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Spin rotation
+      if (dancer.rotation !== 0) {
+        ctx.rotate(dancer.rotation);
+      }
+
+      // Center origin at pelvis/waist level
+      const pelvisX = hipSwayX;
+      const pelvisY = bounceY;
+
+      // Helper for drawing 3D-shaded capsule limbs
+      function drawLimbSegment(x1, y1, x2, y2, w1, w2, baseColor, highlightColor) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.hypot(dx, dy) || 1;
+        const angle = Math.atan2(dy, dx);
+        ctx.save();
+        ctx.translate(x1, y1);
+        ctx.rotate(angle);
+        const grad = ctx.createLinearGradient(0, -w1, 0, w1);
+        grad.addColorStop(0, highlightColor || baseColor);
+        grad.addColorStop(0.5, baseColor);
+        grad.addColorStop(1, '#090d16');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(0, -w1 * 0.5);
+        ctx.lineTo(len, -w2 * 0.5);
+        ctx.arc(len, 0, w2 * 0.5, -Math.PI / 2, Math.PI / 2);
+        ctx.lineTo(0, w1 * 0.5);
+        ctx.arc(0, 0, w1 * 0.5, Math.PI / 2, -Math.PI / 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      const pal = dancer.palette;
+
+      // --- 2. LEGS (Thighs, Calves, and Glowing LED Sneakers) ---
+      const lHipX = pelvisX - 5.5 * s;
+      const lHipY = pelvisY + 2 * s;
+      const rHipX = pelvisX + 5.5 * s;
+      const rHipY = pelvisY + 2 * s;
+
+      // Left Thigh & Calf
+      const pantColor = pal.pants || '#1e293b';
+      const legLowerColor = (pal.outfit === 'neon_dress' || pal.outfit === 'crop_jacket') ? pal.skin : pantColor;
+      const legLowerHi = (pal.outfit === 'neon_dress' || pal.outfit === 'crop_jacket') ? '#ffffff' : '#475569';
+      drawLimbSegment(lHipX, lHipY, lKneeX, lKneeY, 7.5 * s, 6 * s, pantColor, '#475569');
+      drawLimbSegment(lKneeX, lKneeY, lFootX, lFootY, 5.8 * s, 4.5 * s, legLowerColor, legLowerHi);
+
+      // Right Thigh & Calf
+      drawLimbSegment(rHipX, rHipY, rKneeX, rKneeY, 7.5 * s, 6 * s, pantColor, '#475569');
+      drawLimbSegment(rKneeX, rKneeY, rFootX, rFootY, 5.8 * s, 4.5 * s, legLowerColor, legLowerHi);
+
+      // Glowing Club Sneakers / Boots
+      [ { fx: lFootX, fy: lFootY, dir: -1 }, { fx: rFootX, fy: rFootY, dir: 1 } ].forEach(ft => {
+        ctx.save();
+        ctx.translate(ft.fx, ft.fy);
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.roundRect(-4.5 * s, -2 * s, 10 * s, 5.5 * s, 2.5 * s);
+        ctx.fill();
+        // Neon LED sole
+        ctx.fillStyle = pal.shoe || '#38bdf8';
+        ctx.shadowColor = pal.shoe || '#38bdf8';
+        ctx.shadowBlur = 8;
+        ctx.fillRect(-4.5 * s, 2 * s, 10 * s, 2 * s);
+        ctx.restore();
+      });
+
+      // --- 3. TORSO & STYLISH CLUB OUTFIT ---
+      ctx.save();
+      ctx.translate(pelvisX, pelvisY);
+      ctx.rotate(torsoTilt);
+
+      // Hips / Shorts / Skirt base
+      ctx.fillStyle = pantColor;
+      ctx.beginPath();
+      ctx.roundRect(-9.5 * s, -4 * s, 19 * s, 9 * s, 4 * s);
+      ctx.fill();
+      // Stylish Neon Belt
+      ctx.fillStyle = pal.shoe || '#ec4899';
+      ctx.fillRect(-9.5 * s, -3.5 * s, 19 * s, 2.2 * s);
+
+      // Midriff skin (for crop-top style)
+      if (pal.gender === 'female') {
+        ctx.fillStyle = pal.skin;
+        ctx.fillRect(-7.5 * s, -10 * s, 15 * s, 7 * s);
+      }
+
+      // Upper Chest & Jacket with 3D Gradient Shading
+      const torsoGrad = ctx.createLinearGradient(-11 * s, -27 * s, 11 * s, -6 * s);
+      torsoGrad.addColorStop(0, pal.hairHi || '#ec4899');
+      torsoGrad.addColorStop(0.5, pal.body);
+      torsoGrad.addColorStop(1, '#090d16');
+      ctx.fillStyle = torsoGrad;
+
+      ctx.beginPath();
+      if (pal.gender === 'female') {
+        // Hourglass crop-top / club dress silhouette
+        ctx.moveTo(-10.5 * s, -26 * s);
+        ctx.lineTo(10.5 * s, -26 * s);
+        ctx.lineTo(8 * s, -9 * s);
+        ctx.lineTo(-8 * s, -9 * s);
+      } else {
+        // Athletic V-taper hoodie / cyber jacket
+        ctx.moveTo(-12 * s, -27 * s);
+        ctx.lineTo(12 * s, -27 * s);
+        ctx.lineTo(9.5 * s, -3 * s);
+        ctx.lineTo(-9.5 * s, -3 * s);
+      }
+      ctx.closePath();
+      ctx.fill();
+
+      // Open Jacket lapels / Neon trim
+      ctx.strokeStyle = pal.hairHi || '#38bdf8';
+      ctx.lineWidth = 1.4 * s;
+      ctx.stroke();
+
+      // Neck with shaded shadow
+      ctx.fillStyle = pal.skinShadow || pal.skin;
+      ctx.fillRect(-3.2 * s, -32 * s, 6.4 * s, 6.5 * s);
+
+      // --- 4. ARTICULATED ARMS (Upper Arm, Forearm, Hands) ---
+      const shoulderY = -24.5 * s;
+      const lShX = -11 * s;
+      const rShX = 11 * s;
+      const upperArmLen = 11 * s;
+      const foreArmLen = 10.5 * s;
+
+      // Left Arm coordinates
+      const lElbX = lShX - Math.sin(lShoulderA) * upperArmLen;
+      const lElbY = shoulderY + Math.cos(lShoulderA) * upperArmLen;
+      const lHandX = lElbX - Math.sin(lShoulderA + lElbowA) * foreArmLen;
+      const lHandY = lElbY + Math.cos(lShoulderA + lElbowA) * foreArmLen;
+
+      // Right Arm coordinates
+      const rElbX = rShX - Math.sin(rShoulderA) * upperArmLen;
+      const rElbY = shoulderY + Math.cos(rShoulderA) * upperArmLen;
+      const rHandX = rElbX - Math.sin(rShoulderA + rElbowA) * foreArmLen;
+      const rHandY = rElbY + Math.cos(rShoulderA + rElbowA) * foreArmLen;
+
+      const sleeveColor = pal.jacket || pal.body;
+      drawLimbSegment(lShX, shoulderY, lElbX, lElbY, 5.2 * s, 4.4 * s, sleeveColor, pal.body);
+      drawLimbSegment(lElbX, lElbY, lHandX, lHandY, 4.2 * s, 3.4 * s, pal.skin, '#ffffff');
+      drawLimbSegment(rShX, shoulderY, rElbX, rElbY, 5.2 * s, 4.4 * s, sleeveColor, pal.body);
+      drawLimbSegment(rElbX, rElbY, rHandX, rHandY, 4.2 * s, 3.4 * s, pal.skin, '#ffffff');
+
+      // Hands & Neon Wristbands
+      [ { hx: lHandX, hy: lHandY }, { hx: rHandX, hy: rHandY } ].forEach((h, idx) => {
+        ctx.fillStyle = pal.skin;
+        ctx.beginPath();
+        ctx.arc(h.hx, h.hy, 2.6 * s, 0, Math.PI * 2);
+        ctx.fill();
+        if (isSolo) {
+          // Glowing neon light trail on hands when solo dancing!
+          ctx.save();
+          ctx.fillStyle = idx === 0 ? '#38bdf8' : '#f43f5e';
+          ctx.shadowColor = idx === 0 ? '#38bdf8' : '#f43f5e';
+          ctx.shadowBlur = 12;
+          ctx.beginPath();
+          ctx.arc(h.hx, h.hy, 3.2 * s, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      });
+
+      if (dancer.action === 'drink' || dancer.action === 'cheers') {
+        ctx.font = `${Math.floor(13 * s)}px sans-serif`;
+        ctx.fillText('🍹', rHandX + 2 * s, rHandY);
+      }
+
+      // --- 5. REALISTIC PROPORTIONED HEAD, FACE & HAIRSTYLE ---
+      const headCenterY = -41 * s + Math.sin(headNod) * 2 * s;
+      ctx.save();
+      ctx.translate(0, headCenterY);
+      ctx.rotate(headTilt);
+
+      // Back Hair (for long hair / ponytail styles)
+      const hairSway = Math.sin(t * 2.5) * 3.5 * s;
+      if (pal.hairStyle === 'long_wave' || pal.hairStyle === 'ponytail') {
+        ctx.fillStyle = pal.hair;
+        ctx.beginPath();
+        ctx.moveTo(-10 * s, -4 * s);
+        ctx.quadraticCurveTo(-14 * s + hairSway, 10 * s, -9 * s + hairSway * 1.4, 18 * s);
+        ctx.lineTo(9 * s + hairSway * 1.4, 18 * s);
+        ctx.quadraticCurveTo(14 * s + hairSway, 10 * s, 10 * s, -4 * s);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Sculpted Jaw & Face Contour with 3D Radial Skin Shading
+      const faceGrad = ctx.createRadialGradient(-3 * s, -3 * s, 2 * s, 0, 0, 13 * s);
+      faceGrad.addColorStop(0, '#fff5eb');
+      faceGrad.addColorStop(0.55, pal.skin);
+      faceGrad.addColorStop(1, pal.skinShadow || '#d6a282');
+      ctx.fillStyle = faceGrad;
+
+      ctx.beginPath();
+      ctx.moveTo(-9.5 * s, -4 * s);
+      ctx.quadraticCurveTo(-10 * s, 5 * s, -5.5 * s, 9.5 * s);
+      ctx.quadraticCurveTo(0, 12.5 * s, 5.5 * s, 9.5 * s);
+      ctx.quadraticCurveTo(10 * s, 5 * s, 9.5 * s, -4 * s);
+      ctx.arc(0, -3 * s, 9.5 * s, 0, Math.PI, true);
+      ctx.closePath();
+      ctx.fill();
+
+      // Soft Blush on Cheeks
+      ctx.fillStyle = 'rgba(244, 63, 94, 0.28)';
+      ctx.beginPath();
+      ctx.ellipse(-5.5 * s, 3.2 * s, 2.4 * s, 1.3 * s, 0, 0, Math.PI * 2);
+      ctx.ellipse(5.5 * s, 3.2 * s, 2.4 * s, 1.3 * s, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Expressive Eyes (with Blinking, Iris, Pupil, and Catchlight)
+      const isBlinking = (Math.sin(now * 0.004 + dancer.animPhase * 5) > 0.96);
+      // Eyebrows
+      ctx.strokeStyle = pal.hair;
+      ctx.lineWidth = 1.3 * s;
+      ctx.beginPath();
+      ctx.moveTo(-6.8 * s, -2.8 * s);
+      ctx.quadraticCurveTo(-4.2 * s, -4.2 * s, -1.8 * s, -2.6 * s);
+      ctx.moveTo(1.8 * s, -2.6 * s);
+      ctx.quadraticCurveTo(4.2 * s, -4.2 * s, 6.8 * s, -2.8 * s);
+      ctx.stroke();
+
+      if (isBlinking) {
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 1.4 * s;
+        ctx.beginPath();
+        ctx.arc(-4.2 * s, 0, 2.2 * s, 0.1 * Math.PI, 0.9 * Math.PI);
+        ctx.moveTo(2.0 * s, 0);
+        ctx.arc(4.2 * s, 0, 2.2 * s, 0.1 * Math.PI, 0.9 * Math.PI);
+        ctx.stroke();
+      } else {
+        [ -4.2 * s, 4.2 * s ].forEach(ex => {
+          // Sclera (white)
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.ellipse(ex, 0, 2.5 * s, 2.0 * s, 0, 0, Math.PI * 2);
+          ctx.fill();
+          // Iris
+          ctx.fillStyle = pal.hairHi || '#38bdf8';
+          ctx.beginPath();
+          ctx.arc(ex, 0, 1.5 * s, 0, Math.PI * 2);
+          ctx.fill();
+          // Pupil
+          ctx.fillStyle = '#090d16';
+          ctx.beginPath();
+          ctx.arc(ex, 0, 0.85 * s, 0, Math.PI * 2);
+          ctx.fill();
+          // Catchlight sparkle
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(ex - 0.6 * s, -0.6 * s, 0.55 * s, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      // Subtle Nose highlight & shadow
+      ctx.strokeStyle = 'rgba(180, 110, 80, 0.55)';
+      ctx.lineWidth = 1 * s;
+      ctx.beginPath();
+      ctx.moveTo(0, -0.5 * s);
+      ctx.lineTo(-0.8 * s, 2.6 * s);
+      ctx.lineTo(0.6 * s, 2.8 * s);
+      ctx.stroke();
+
+      // Lips / Confident Smile
+      ctx.fillStyle = pal.gender === 'female' ? '#e11d48' : '#be123c';
+      ctx.beginPath();
+      if (isSolo && Math.sin(t * 4) > 0) {
+        // Singing / hyping expression
+        ctx.ellipse(0, 6.2 * s, 2.8 * s, 2.0 * s, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.arc(0, 5.2 * s, 2.8 * s, 0.08 * Math.PI, 0.92 * Math.PI);
+        ctx.fill();
+      }
+
+      // Front Stylized Hair with Glossy Highlight
+      const hairGrad = ctx.createLinearGradient(-10 * s, -14 * s, 10 * s, 4 * s);
+      hairGrad.addColorStop(0, pal.hair);
+      hairGrad.addColorStop(0.5, pal.hairHi || '#ec4899');
+      hairGrad.addColorStop(1, pal.hair);
+      ctx.fillStyle = hairGrad;
+
+      ctx.beginPath();
+      ctx.arc(0, -4.5 * s, 10.6 * s, Math.PI * 0.92, Math.PI * 2.08);
+      // Stylish side-swept bangs
+      ctx.quadraticCurveTo(11 * s, 2 * s, 8.5 * s, 4 * s);
+      ctx.quadraticCurveTo(4 * s, -4 * s, 0, -2.5 * s);
+      ctx.quadraticCurveTo(-5 * s, -5 * s, -8.5 * s, 4 * s);
+      ctx.closePath();
+      ctx.fill();
+
+      if (pal.hairStyle === 'twin_buns') {
+        ctx.beginPath();
+        ctx.arc(-9.5 * s, -10.5 * s, 4.2 * s, 0, Math.PI * 2);
+        ctx.arc(9.5 * s, -10.5 * s, 4.2 * s, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Accessories: Cyber Sunglasses
+      if (dancer.hasGlasses || isSolo) {
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 1.2 * s;
+        ctx.beginPath();
+        ctx.roundRect(-8.5 * s, -2.2 * s, 7.6 * s, 4.2 * s, 1.2 * s);
+        ctx.roundRect(0.9 * s, -2.2 * s, 7.6 * s, 4.2 * s, 1.2 * s);
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // Accessories: Snapback Cap
+      if (dancer.hasCap) {
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath();
+        ctx.arc(0, -6.5 * s, 10.8 * s, Math.PI, Math.PI * 2);
+        ctx.fill();
+        ctx.fillRect(-12 * s, -7.2 * s, 24 * s, 2.8 * s);
+      }
+
+      // Crown for Top Gifter
+      if (dancer.hasCrown) {
+        ctx.font = `${Math.floor(15 * s)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText('👑', 0, -16 * s);
+      }
+
+      ctx.restore(); // End head transform
+      ctx.restore(); // End torso transform
+
+      // --- 6. FLOATING NAME TAG, DANCE ROUTINE BADGE & CHAT BUBBLE ---
+      const tagY = pelvisY - (dancer.hasCrown ? 66 * s : 56 * s);
+      ctx.font = `bold ${Math.max(9, Math.floor(10 * s))}px "Plus Jakarta Sans", sans-serif`;
+      ctx.textAlign = 'center';
+
+      const nameText = dancer.nickname;
+      const tagW = ctx.measureText(nameText).width + 14;
+      ctx.fillStyle = isSolo ? 'rgba(131, 24, 67, 0.92)' : 'rgba(15, 23, 42, 0.85)';
+      ctx.strokeStyle = (dancer.hasCrown || isSolo) ? '#fde047' : 'rgba(236, 72, 153, 0.45)';
+      ctx.lineWidth = isSolo ? 1.8 : 1;
+      ctx.beginPath();
+      ctx.roundRect(pelvisX - tagW / 2, tagY - 11, tagW, 15, 5);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = (dancer.hasCrown || isSolo) ? '#fde047' : '#ffffff';
+      ctx.fillText(nameText, pelvisX, tagY);
+
+      // Action Label or Solo Dance Choreography Label
+      if (isSolo) {
+        ctx.font = `bold ${Math.max(9, Math.floor(9.5 * s))}px "Orbitron", sans-serif`;
+        ctx.fillStyle = '#38bdf8';
+        ctx.shadowColor = '#06b6d4';
+        ctx.shadowBlur = 8;
+        ctx.fillText(`✨ ${dancer.danceStyleName || 'SOLO DANCE'}`, pelvisX, tagY - 15);
+        ctx.shadowBlur = 0;
+      } else if (dancer.actionLabel && now < dancer.actionLabelUntil) {
+        ctx.font = `bold ${Math.max(9, Math.floor(10 * s))}px "Orbitron", sans-serif`;
+        ctx.fillStyle = '#fde047';
+        ctx.shadowColor = '#f59e0b';
+        ctx.shadowBlur = 8;
+        ctx.fillText(dancer.actionLabel, pelvisX, tagY - 14);
+        ctx.shadowBlur = 0;
+      }
+
+      // Speech / Chat Bubble
+      if (dancer.chatMessage && now < dancer.chatUntil) {
+        drawChatBubble(pelvisX, tagY - 26, dancer.chatMessage, s);
+      }
+
+      ctx.restore();
+    }
+
+    // Draw Chat Bubble Above Dancer
+    function drawChatBubble(x, y, text, s) {
+      ctx.font = `${Math.max(10, Math.floor(11 * s))}px "Plus Jakarta Sans", sans-serif`;
+      const textW = Math.min(ctx.measureText(text).width + 16, 160);
+      const textH = 20;
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.strokeStyle = '#ec4899';
+      ctx.lineWidth = 1.5;
+      ctx.shadowColor = 'rgba(236, 72, 153, 0.5)';
+      ctx.shadowBlur = 10;
+
+      // Bubble body
+      ctx.beginPath();
+      ctx.roundRect(x - textW / 2, y - textH, textW, textH, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      // Small pointer triangle
+      ctx.beginPath();
+      ctx.moveTo(x - 4, y);
+      ctx.lineTo(x, y + 5);
+      ctx.lineTo(x + 4, y);
+      ctx.fill();
+
+      // Text inside
+      ctx.fillStyle = '#0f172a';
+      ctx.textAlign = 'center';
+      ctx.fillText(truncateText(text, 22), x, y - 6);
+      ctx.restore();
+    }
+
+    function truncateText(str, maxLen) {
+      return str.length > maxLen ? str.substring(0, maxLen - 1) + '…' : str;
+    }
+
+    // Draw Particles (Hearts, Confetti, Fireworks)
+    function drawParticles() {
+      // 1. Hearts
+      for (let i = hearts.length - 1; i >= 0; i--) {
+        const h = hearts[i];
+        h.x += h.vx;
+        h.y += h.vy;
+        h.alpha -= 0.012;
+        if (h.alpha <= 0) {
+          hearts.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = h.alpha;
+        ctx.font = `${h.size}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText('❤️', h.x, h.y);
+        ctx.restore();
+      }
+
+      // 2. Confetti
+      for (let i = confetti.length - 1; i >= 0; i--) {
+        const c = confetti[i];
+        c.x += c.vx;
+        c.y += c.vy;
+        c.vy += 0.15; // gravity
+        c.rot += c.vRot;
+        c.alpha -= 0.008;
+        if (c.y > ch || c.alpha <= 0) {
+          confetti.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = c.alpha;
+        ctx.fillStyle = c.color;
+        ctx.translate(c.x, c.y);
+        ctx.rotate(c.rot);
+        ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size * 0.6);
+        ctx.restore();
+      }
+
+      // 3. Fireworks
+      for (let i = fireworks.length - 1; i >= 0; i--) {
+        const f = fireworks[i];
+        f.x += f.vx;
+        f.y += f.vy;
+        f.vy += 0.08;
+        f.alpha -= f.decay;
+        if (f.alpha <= 0) {
+          fireworks.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = f.alpha;
+        ctx.fillStyle = f.color;
+        ctx.shadowColor = f.color;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // Draw Smoke & Club Vignette
+    function drawSmokeAndVignette() {
+      // Vignette
+      const vig = ctx.createRadialGradient(cw / 2, ch / 2, cw * 0.35, cw / 2, ch / 2, cw * 0.7);
+      vig.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      vig.addColorStop(1, 'rgba(3, 4, 12, 0.65)');
+      ctx.fillStyle = vig;
+      ctx.fillRect(0, 0, cw, ch);
+    }
+
+    // --- Special FX Layer Renderer (Galaxy & Lion) ---
+    function renderSpecialFXLayer() {
+      fxCtx.clearRect(0, 0, cw, ch);
+      if (!specialFX) return;
+
+      specialFX.frame++;
+      const progress = specialFX.frame / specialFX.maxFrames;
+      if (progress >= 1) {
+        specialFX = null;
+        return;
+      }
+
+      const alpha = Math.sin(progress * Math.PI); // Fade in & out
+
+      if (specialFX.type === 'galaxy') {
+        // Cosmic spiral galaxy effect
+        fxCtx.save();
+        fxCtx.globalAlpha = alpha * 0.85;
+        const centerX = cw * 0.5;
+        const centerY = ch * 0.45;
+        const rot = specialFX.frame * 0.03;
+
+        // Galactic rings
+        for (let r = 0; r < 4; r++) {
+          fxCtx.strokeStyle = ['#c084fc', '#818cf8', '#38bdf8', '#f472b6'][r];
+          fxCtx.lineWidth = 3;
+          fxCtx.shadowColor = '#a855f7';
+          fxCtx.shadowBlur = 18;
+          fxCtx.beginPath();
+          fxCtx.ellipse(centerX, centerY, 120 + r * 50, 45 + r * 20, rot + r * 0.3, 0, Math.PI * 2);
+          fxCtx.stroke();
+        }
+
+        // Title banner
+        fxCtx.font = '900 24px "Orbitron", sans-serif';
+        fxCtx.fillStyle = '#fdf4ff';
+        fxCtx.textAlign = 'center';
+        fxCtx.shadowColor = '#c084fc';
+        fxCtx.shadowBlur = 20;
+        fxCtx.fillText(`🌌 VŨ TRỤ HUYỀN ẢO: ${specialFX.gifterName}`, centerX, ch * 0.28);
+        fxCtx.restore();
+
+      } else if (specialFX.type === 'lion') {
+        // Golden Lion Roar Effect
+        fxCtx.save();
+        fxCtx.globalAlpha = alpha;
+        const centerX = cw * 0.5;
+        const centerY = ch * 0.42;
+
+        // Golden Aura burst
+        const goldGrad = fxCtx.createRadialGradient(centerX, centerY, 10, centerX, centerY, cw * 0.4);
+        goldGrad.addColorStop(0, 'rgba(251, 191, 36, 0.45)');
+        goldGrad.addColorStop(0.7, 'rgba(217, 119, 6, 0.15)');
+        goldGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        fxCtx.fillStyle = goldGrad;
+        fxCtx.fillRect(0, 0, cw, ch);
+
+        // Giant Golden Lion Emoji / Icon
+        const lionSize = Math.min(cw, ch) * 0.28 * (1 + Math.sin(progress * Math.PI) * 0.2);
+        fxCtx.font = `${Math.floor(lionSize)}px sans-serif`;
+        fxCtx.textAlign = 'center';
+        fxCtx.textBaseline = 'middle';
+        fxCtx.shadowColor = '#f59e0b';
+        fxCtx.shadowBlur = 30;
+        fxCtx.fillText('🦁', centerX, centerY);
+
+        // Banner
+        fxCtx.font = '900 26px "Orbitron", sans-serif';
+        fxCtx.fillStyle = '#fef08a';
+        fxCtx.shadowColor = '#eab308';
+        fxCtx.shadowBlur = 25;
+        fxCtx.fillText(`👑 VUA SÀN NHẢY: ${specialFX.gifterName}`, centerX, ch * 0.22);
+        fxCtx.font = 'bold 16px "Orbitron", sans-serif';
+        fxCtx.fillStyle = '#fde047';
+        fxCtx.fillText('THẦN THÚ SƯ TỬ VÀNG ĐÃ XUẤT HIỆN!', centerX, ch * 0.27);
+        fxCtx.restore();
+
+      } else if (specialFX.type === 'champagne') {
+        // Champagne Bottle spray
+        fxCtx.save();
+        fxCtx.globalAlpha = alpha;
+        const centerX = cw * 0.5;
+        const centerY = ch * 0.38;
+
+        fxCtx.font = '72px sans-serif';
+        fxCtx.textAlign = 'center';
+        fxCtx.fillText('🍾', centerX, centerY);
+
+        fxCtx.font = 'bold 20px "Orbitron", sans-serif';
+        fxCtx.fillStyle = '#fde047';
+        fxCtx.shadowColor = '#eab308';
+        fxCtx.shadowBlur = 15;
+        fxCtx.fillText(`🥂 ${specialFX.gifterName} KHUI SÂM PANH TOÀN SÀN!`, centerX, centerY - 60);
+        fxCtx.restore();
+      }
+    }
+
+    // --- TikTok Interaction Handlers (Likes, Comments, Gifts) ---
+    function handleTikTokLike(username, count = 1) {
+      STATE.likesCount += count;
+      document.getElementById('stat-likes').innerText = STATE.likesCount.toLocaleString();
+
+      // Add to hype meter
+      addHype(count * 2);
+
+      // Spawn heart particles
+      spawnHeart(null, null, Math.min(count, 8));
+
+      // Get or spawn dancer
+      const dancer = getOrCreateDancer(username);
+      dancer.jump();
+    }
+
+    function handleTikTokComment(username, message, nickname = '') {
+      const dancer = getOrCreateDancer(username, nickname);
+      dancer.say(message);
+
+      // Add to chat feed
+      addChatMessage(username, message, nickname);
+
+      // Add hype
+      addHype(5);
+
+      // Check for command triggers
+      const lower = message.toLowerCase().trim();
+      if (lower.includes('nhay') || lower.includes('dance') || lower.includes('quay')) {
+        dancer.setAction('dance', '💃 QUẨY HẾT NẤC', 3000);
+      } else if (lower.includes('uong') || lower.includes('drink') || lower.includes('bia') || lower.includes('ruou')) {
+        dancer.setAction('drink', '🍹 UỐNG CẠN LY', 4000);
+      } else if (lower.includes('nhaylen') || lower.includes('jump')) {
+        dancer.jump();
+      } else if (lower.includes('xoay') || lower.includes('spin')) {
+        dancer.spin();
+      } else if (lower.includes('123zo') || lower.includes('cheers') || lower.includes('zo')) {
+        dancer.setAction('cheers', '🍻 1 2 3 ZÔ!', 4000);
+        playSFX('airhorn');
+      } else if (lower.includes('dj')) {
+        dancer.targetGridX = 0.5;
+        dancer.targetGridY = 0.38;
+        dancer.setAction('dance', '🎧 LÊN BÀN DJ', 4000);
+      }
+    }
+
+    const GIFT_DATA = {
+      rose: { name: 'Hoa Hồng 🌹', coins: 10, color: 'text-rose-400' },
+      heart: { name: 'Bắn Tim 💖', coins: 50, color: 'text-pink-400' },
+      cap: { name: 'Kính & Mũ 🧢', coins: 99, color: 'text-blue-400' },
+      champagne: { name: 'Sâm Panh 🍾', coins: 299, color: 'text-amber-400' },
+      fireworks: { name: 'Pháo Hoa 🎆', coins: 1088, color: 'text-cyan-400' },
+      galaxy: { name: 'Vũ Trụ 🌌', coins: 1000, color: 'text-purple-400' },
+      lion: { name: 'Sư Tử Vàng 🦁', coins: 29999, color: 'text-yellow-400' }
+    };
+
+    function handleTikTokGift(username, giftType, count = 1, nickname = '') {
+      const info = GIFT_DATA[giftType] || { name: giftType, coins: 50, color: 'text-white' };
+      const totalCoins = info.coins * count;
+
+      STATE.giftsCount += count;
+      STATE.totalCoins += totalCoins;
+      document.getElementById('stat-gifts').innerText = STATE.giftsCount.toLocaleString();
+
+      const dancer = getOrCreateDancer(username, nickname);
+      dancer.applyGift(giftType, totalCoins);
+
+      // Trigger Camera Spotlight Zoom & Solo Dance Routine!
+      triggerCameraSpotlight(dancer, info.name, totalCoins);
+
+      // Add to hype meter
+      addHype(totalCoins * 0.8);
+
+      // Trigger SFX & Visuals
+      if (giftType === 'rose') {
+        playSFX('coin');
+        spawnHeart(null, null, 12);
+      } else if (giftType === 'heart') {
+        playSFX('coin');
+        spawnHeart(null, null, 25);
+      } else if (giftType === 'cap') {
+        playSFX('scratch');
+      } else if (giftType === 'champagne') {
+        triggerSpecialFX('champagne', dancer.nickname);
+      } else if (giftType === 'fireworks') {
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            spawnFirework(cw * (0.2 + Math.random() * 0.6), ch * (0.2 + Math.random() * 0.3));
+          }, i * 250);
+        }
+      } else if (giftType === 'galaxy') {
+        triggerSpecialFX('galaxy', dancer.nickname);
+      } else if (giftType === 'lion') {
+        triggerSpecialFX('lion', dancer.nickname);
+      }
+
+      // Show Gift Alert Banner
+      showGiftAlert(dancer.nickname, info.name, count, totalCoins);
+
+      // Update Leaderboard
+      updateLeaderboard();
+    }
+
+    // --- Hype & Fever Mode Logic ---
+    function addHype(amount) {
+      if (STATE.isFever) return;
+      STATE.hypeScore = Math.min(STATE.hypeScore + amount, CONFIG.feverHypeThreshold);
+      const pct = Math.floor((STATE.hypeScore / CONFIG.feverHypeThreshold) * 100);
+
+      document.getElementById('hype-percent').innerText = `${pct}%`;
+      document.getElementById('hype-bar').style.width = `${pct}%`;
+
+      if (STATE.hypeScore >= CONFIG.feverHypeThreshold) {
+        startFeverMode();
+      }
+    }
+
+    function startFeverMode() {
+      STATE.isFever = true;
+      STATE.feverEndTime = Date.now() + CONFIG.feverDuration;
+      STATE.hypeScore = 0;
+
+      // Update UI
+      document.getElementById('fever-overlay').style.opacity = '1';
+      document.getElementById('fever-text').style.opacity = '1';
+      document.getElementById('hype-bar').style.width = '100%';
+      document.getElementById('hype-percent').innerText = 'FEVER!';
+
+      playSFX('airhorn');
+      spawnConfetti(100);
+
+      // Speed up dancers & make all jump
+      STATE.dancers.forEach(d => {
+        d.spin();
+        d.setAction('dance', '🔥 FEVER DROP!', 6000);
+      });
+    }
+
+    // --- Helper: Get or Create Dancer ---
+    function getOrCreateDancer(username, nickname = '') {
+      if (!STATE.dancers.has(username)) {
+        // Enforce maximum dancers to prevent lagging
+        if (STATE.dancers.size >= CONFIG.maxDancers) {
+          // Remove oldest least active dancer
+          let oldest = null;
+          let oldestTime = Infinity;
+          STATE.dancers.forEach((d, k) => {
+            if (d.totalCoins === 0 && d.lastActiveTime < oldestTime) {
+              oldestTime = d.lastActiveTime;
+              oldest = k;
+            }
+          });
+          if (oldest) STATE.dancers.delete(oldest);
+        }
+
+        const dancer = new Dancer(username, nickname);
+        STATE.dancers.set(username, dancer);
+        document.getElementById('stat-dancers').innerText = STATE.dancers.size;
+      }
+      return STATE.dancers.get(username);
+    }
+
+    // --- UI Notifications: Gift Banner Alert ---
+    function showGiftAlert(nickname, giftName, count, coins) {
+      const container = document.getElementById('gift-banner-container');
+      const banner = document.createElement('div');
+      banner.className = 'flex items-center gap-2.5 px-3 py-2 rounded-lg bg-slate-900/90 border border-pink-500/60 shadow-[0_0_15px_rgba(236,72,153,0.4)] backdrop-blur-md transform transition-all duration-300 translate-x-[-120%] opacity-0';
+      banner.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-purple-500 flex items-center justify-center font-bold text-white text-xs border border-pink-300">
+          ${nickname.charAt(0).toUpperCase()}
+        </div>
+        <div class="flex-1">
+          <div class="text-[11px] font-bold text-white truncate max-w-[140px]">${nickname}</div>
+          <div class="text-[10px] text-pink-300 font-semibold">Tặng <span class="text-yellow-300 font-bold">${giftName}</span></div>
+        </div>
+        <div class="font-gaming font-black text-sm text-yellow-400 tracking-wider">
+          x${count}
+        </div>
+      `;
+
+      container.appendChild(banner);
+      requestAnimationFrame(() => {
+        banner.classList.remove('translate-x-[-120%]', 'opacity-0');
+        banner.classList.add('translate-x-0', 'opacity-100');
+      });
+
+      // Remove after 3.8s
+      setTimeout(() => {
+        banner.classList.add('translate-x-[-120%]', 'opacity-0');
+        setTimeout(() => banner.remove(), 400);
+      }, 3800);
+    }
+
+    // --- UI: Chat Message Feed ---
+    let chatCount = 0;
+    function addChatMessage(username, message, nickname = '') {
+      chatCount++;
+      document.getElementById('chat-count').innerText = chatCount;
+
+      const list = document.getElementById('chat-stream-list');
+      const item = document.createElement('div');
+      item.className = 'p-1.5 rounded bg-slate-900/60 border border-slate-800 text-[11px] flex flex-col gap-0.5 animate-fadeIn';
+      item.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-cyan-300">${nickname || username}</span>
+          <span class="text-[9px] text-slate-500">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <div class="text-slate-200 break-words">${escapeHTML(message)}</div>
+      `;
+      list.prepend(item);
+
+      // Keep maximum 35 items
+      if (list.children.length > 35) {
+        list.removeChild(list.lastChild);
+      }
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[tag] || tag));
+    }
+
+    // --- UI: Leaderboard Updater ---
+    function updateLeaderboard() {
+      const list = document.getElementById('leaderboard-list');
+      const dancers = Array.from(STATE.dancers.values())
+        .filter(d => d.totalCoins > 0)
+        .sort((a, b) => b.totalCoins - a.totalCoins)
+        .slice(0, 10);
+
+      // Crown top 1
+      STATE.dancers.forEach(d => (d.hasCrown = false));
+      if (dancers.length > 0) {
+        dancers[0].hasCrown = true;
+      }
+
+      list.innerHTML = '';
+      if (dancers.length === 0) {
+        list.innerHTML = `<div class="text-slate-500 text-center py-4 text-xs">Chưa có đại gia tặng quà... Hãy là người đầu tiên!</div>`;
+        return;
+      }
+
+      dancers.forEach((dancer, idx) => {
+        const item = document.createElement('div');
+        const isTop1 = idx === 0;
+        const isTop2 = idx === 1;
+        const isTop3 = idx === 2;
+
+        let badge = `<span class="w-5 text-center font-gaming text-slate-400 font-bold">${idx + 1}</span>`;
+        let borderClass = 'border-slate-800 bg-slate-900/50';
+
+        if (isTop1) {
+          badge = `<span class="w-5 text-center text-sm">👑</span>`;
+          borderClass = 'border-yellow-500/50 bg-yellow-950/20 shadow-[0_0_8px_rgba(234,179,8,0.2)]';
+        } else if (isTop2) {
+          badge = `<span class="w-5 text-center text-sm">🥈</span>`;
+          borderClass = 'border-slate-400/50 bg-slate-800/30';
+        } else if (isTop3) {
+          badge = `<span class="w-5 text-center text-sm">🥉</span>`;
+          borderClass = 'border-amber-600/50 bg-amber-950/20';
+        }
+
+        item.className = `flex items-center justify-between p-1.5 rounded border ${borderClass} text-xs`;
+        item.innerHTML = `
+          <div class="flex items-center gap-1.5 truncate max-w-[160px]">
+            ${badge}
+            <span class="font-bold ${isTop1 ? 'text-yellow-300' : 'text-slate-200'} truncate">${dancer.nickname}</span>
+          </div>
+          <div class="font-gaming font-bold ${isTop1 ? 'text-yellow-400' : 'text-pink-400'}">
+            ${dancer.totalCoins.toLocaleString()} <span class="text-[9px]">Xu</span>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    // --- Automated Realistic Simulation Engine (Auto Demo Mode) ---
+    const MOCK_USERS = [
+      { u: 'phuc_vip', n: 'Phúc VIP 💎' },
+      { u: 'linh_cute', n: 'Linh Babie ✨' },
+      { u: 'hoang_tu_bar', n: 'Hoàng Tử Sàn 🕺' },
+      { u: 'thuy_tien_dj', n: 'Tiên DJ 🎧' },
+      { u: 'nam_hai_phong', n: 'Nam Hải Phòng ⚡' },
+      { u: 'huyen_trang', n: 'Huyền Trang 🌸' },
+      { u: 'dragon_master', n: 'Đại Gia Rồng 🐉' },
+      { u: 'anh_ba_sai_gon', n: 'Anh Ba Sài Gòn 🍻' }
+    ];
+
+    const MOCK_CHATS = [
+      'Quẩy lên anh em ơi!',
+      'Nhạc căng đét luôn 🔥',
+      'uong',
+      'nhay',
+      '123zo',
+      'Chào cả phòng nhé',
+      'Sàn nhảy xịn sò ghê',
+      'xoay',
+      'nhaylen',
+      'Lên nóc nhà bắt con gà 🐔',
+      'Cho xin 1 bài Vinahouse nào DJ ơi!',
+      'Quẩy nhiệt tình lên cả nhà!'
+    ];
+
+    let autoTimerId = null;
+
+    function runAutoSimulationTick() {
+      if (!STATE.isAutoDemo) return;
+
+      const rand = Math.random();
+      const user = MOCK_USERS[Math.floor(Math.random() * MOCK_USERS.length)];
+
+      if (rand < 0.45) {
+        // Chat action
+        const chat = MOCK_CHATS[Math.floor(Math.random() * MOCK_CHATS.length)];
+        handleTikTokComment(user.u, chat, user.n);
+      } else if (rand < 0.85) {
+        // Like burst
+        handleTikTokLike(user.u, 5 + Math.floor(Math.random() * 15));
+      } else {
+        // Gift action
+        const gifts = ['rose', 'heart', 'cap', 'champagne', 'fireworks', 'galaxy', 'lion'];
+        const weights = [40, 25, 15, 10, 6, 3, 1]; // Rare lion/galaxy
+        let picked = 'rose';
+        const totalW = weights.reduce((a, b) => a + b, 0);
+        let roll = Math.random() * totalW;
+        for (let i = 0; i < gifts.length; i++) {
+          if (roll < weights[i]) {
+            picked = gifts[i];
+            break;
+          }
+          roll -= weights[i];
+        }
+        handleTikTokGift(user.u, picked, 1, user.n);
+      }
+
+      // Next tick with realistic jitter
+      const nextDelay = 800 + Math.random() * 1600;
+      autoTimerId = setTimeout(runAutoSimulationTick, nextDelay);
+    }
+
+    // --- WebSocket Client for Real TikTok Live Connector ---
+    function connectTikTokWebSocket(wsUrl, username, panelKey) {
+      if (STATE.ws) {
+        try { STATE.ws.close(); } catch (e) {}
+      }
+
+      updateConnStatus('connecting', 'Đang kết nối...');
+      try {
+        const socket = new WebSocket(wsUrl);
+        STATE.ws = socket;
+
+        socket.onopen = () => {
+          updateConnStatus('connected', `@${username} (Live)`);
+          document.getElementById('modal-status-text').innerHTML = `<span class="text-emerald-400">Đã kết nối với @${username}!</span>`;
+          // Send handshake/subscribe
+          socket.send(JSON.stringify({ type: 'subscribe', username: username, key: panelKey || '' }));
+        };
+
+        socket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            handleIncomingLiveEvent(data);
+          } catch (err) {
+            console.error('Lỗi phân tích WebSocket message:', err);
+          }
+        };
+
+        socket.onerror = (err) => {
+          console.warn('Lỗi WebSocket:', err);
+          updateConnStatus('error', 'Lỗi kết nối WS');
+        };
+
+        socket.onclose = () => {
+          updateConnStatus('demo', 'Demo Mode');
+          document.getElementById('modal-status-text').innerHTML = `<span class="text-yellow-400">Đã ngắt kết nối. Trở về Demo Mode.</span>`;
+        };
+      } catch (e) {
+        updateConnStatus('error', 'Không thể mở WS');
+      }
+    }
+
+    function handleIncomingLiveEvent(event) {
+      // Handles standardized events forwarded by the Node.js TikTokLiveConnector bridge
+      if (event.type === 'chat') {
+        handleTikTokComment(event.uniqueId || event.user, event.comment || event.message, event.nickname);
+      } else if (event.type === 'gift') {
+        const giftName = (event.giftName || '').toLowerCase();
+        let giftType = 'rose';
+        if (giftName.includes('rose') || giftName.includes('hoa hồng')) giftType = 'rose';
+        else if (giftName.includes('heart') || giftName.includes('tim')) giftType = 'heart';
+        else if (giftName.includes('cap') || giftName.includes('glasses') || giftName.includes('kính') || giftName.includes('mũ')) giftType = 'cap';
+        else if (giftName.includes('champagne') || giftName.includes('sâm panh') || giftName.includes('perfume')) giftType = 'champagne';
+        else if (giftName.includes('firework') || giftName.includes('pháo hoa')) giftType = 'fireworks';
+        else if (giftName.includes('galaxy') || giftName.includes('vũ trụ')) giftType = 'galaxy';
+        else if (giftName.includes('lion') || giftName.includes('dragon') || giftName.includes('sư tử') || giftName.includes('rồng')) giftType = 'lion';
+        
+        handleTikTokGift(event.uniqueId || event.user, giftType, event.repeatCount || event.count || 1, event.nickname);
+      } else if (event.type === 'like') {
+        handleTikTokLike(event.uniqueId || event.user, event.likeCount || 1);
+      }
+    }
+
+    function updateConnStatus(status, text) {
+      const dot = document.getElementById('conn-dot');
+      const label = document.getElementById('conn-label');
+      label.innerText = text;
+
+      if (status === 'connected') {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]';
+      } else if (status === 'connecting') {
+        dot.className = 'w-2 h-2 rounded-full bg-cyan-400 animate-ping';
+      } else if (status === 'error') {
+        dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-yellow-400';
+      }
+    }
+
+    
+    // In-page Toast notification
+    function showToast(msg, type = 'info') {
+      let toast = document.getElementById('inpage-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'inpage-toast';
+        toast.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-xs font-bold shadow-2xl transition-all duration-300 pointer-events-none opacity-0';
+        document.body.appendChild(toast);
+      }
+      toast.innerText = msg;
+      if (type === 'warning') {
+        toast.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-xs font-bold shadow-2xl transition-all duration-300 pointer-events-none bg-rose-600 text-white border border-rose-400 opacity-100';
+      } else {
+        toast.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-xs font-bold shadow-2xl transition-all duration-300 pointer-events-none bg-slate-900 text-cyan-300 border border-cyan-500 opacity-100';
+      }
+      setTimeout(() => {
+        if (toast) toast.classList.replace('opacity-100', 'opacity-0');
+      }, 2500);
+    }
+
+    // --- UI Event Listeners & Wiring ---
+    function setupEventListeners() {
+      // Start audio on first user interaction anywhere
+      const unlockAudio = () => {
+        initAudio();
+        window.removeEventListener('click', unlockAudio);
+        window.removeEventListener('keydown', unlockAudio);
+      };
+      window.addEventListener('click', unlockAudio);
+      window.addEventListener('keydown', unlockAudio);
+
+      // Music toggle button
+      document.getElementById('btn-music').addEventListener('click', () => {
+        initAudio();
+        STATE.audioMuted = !STATE.audioMuted;
+        document.getElementById('music-status').innerText = STATE.audioMuted ? 'MUSIC: OFF' : 'MUSIC: ON';
+        document.getElementById('music-icon').innerText = STATE.audioMuted ? '🔇' : '🎵';
+      });
+
+      // OBS Clean Screen Toggle (Hides header and controls for clean streaming capture)
+      const toggleOBS = () => {
+        STATE.isOBSClean = !STATE.isOBSClean;
+        document.getElementById('top-header').style.display = STATE.isOBSClean ? 'none' : 'flex';
+        document.getElementById('bottom-controls').style.display = STATE.isOBSClean ? 'none' : 'flex';
+        document.getElementById('sidebar-panel').style.display = STATE.isOBSClean ? 'none' : 'flex';
+        document.getElementById('obs-hint').style.display = STATE.isOBSClean ? 'none' : 'block';
+        resizeCanvas();
+      };
+      document.getElementById('btn-toggle-obs').addEventListener('click', toggleOBS);
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'h' || e.key === 'H') {
+          // If not typing in input
+          if (document.activeElement.tagName !== 'INPUT') {
+            toggleOBS();
+          }
+        }
+      });
+
+      // Quick Gift simulation buttons
+      document.querySelectorAll('.gift-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          initAudio();
+          const giftType = btn.getAttribute('data-gift');
+          const mockUser = MOCK_USERS[Math.floor(Math.random() * MOCK_USERS.length)];
+          handleTikTokGift(mockUser.u, giftType, 1, mockUser.n);
+        });
+      });
+
+      // Quick Like button
+      document.getElementById('btn-sim-like').addEventListener('click', () => {
+        initAudio();
+        const mockUser = MOCK_USERS[Math.floor(Math.random() * MOCK_USERS.length)];
+        handleTikTokLike(mockUser.u, 50);
+      });
+
+      // Auto Demo toggle button
+      const autoBtn = document.getElementById('btn-toggle-auto');
+      autoBtn.addEventListener('click', () => {
+        STATE.isAutoDemo = !STATE.isAutoDemo;
+        document.getElementById('auto-btn-text').innerText = STATE.isAutoDemo ? 'Tự Động Quẩy: BẬT' : 'Tự Động Quẩy: TẮT';
+        document.getElementById('auto-spin-icon').style.display = STATE.isAutoDemo ? 'inline-block' : 'none';
+        if (STATE.isAutoDemo) {
+          runAutoSimulationTick();
+        } else if (autoTimerId) {
+          clearTimeout(autoTimerId);
+        }
+      });
+
+      // Chat Command Input
+      const chatInput = document.getElementById('input-test-chat');
+      const sendChat = () => {
+        const val = chatInput.value.trim();
+        if (!val) return;
+        initAudio();
+        handleTikTokComment('you_streamer', val, 'Bạn (Chủ Phòng) 👑');
+        chatInput.value = '';
+      };
+      document.getElementById('btn-send-chat').addEventListener('click', sendChat);
+      chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendChat();
+      });
+
+      // Chat command pills
+      document.querySelectorAll('.cmd-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          initAudio();
+          handleTikTokComment('you_streamer', pill.innerText, 'Bạn (Chủ Phòng) 👑');
+        });
+      });
+
+      // Tabs: Leaderboard vs Chat
+      const tabLeadBtn = document.getElementById('tab-leaderboard-btn');
+      const tabChatBtn = document.getElementById('tab-chat-btn');
+      const tabLead = document.getElementById('tab-leaderboard');
+      const tabChat = document.getElementById('tab-chat');
+
+      tabLeadBtn.addEventListener('click', () => {
+        tabLead.classList.remove('hidden');
+        tabChat.classList.add('hidden');
+        tabLeadBtn.className = 'flex-1 py-2 font-bold text-center border-b-2 border-pink-500 text-pink-400 flex items-center justify-center gap-1.5 transition';
+        tabChatBtn.className = 'flex-1 py-2 font-bold text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition';
+      });
+
+      tabChatBtn.addEventListener('click', () => {
+        tabChat.classList.remove('hidden');
+        tabLead.classList.add('hidden');
+        tabChatBtn.className = 'flex-1 py-2 font-bold text-center border-b-2 border-cyan-500 text-cyan-400 flex items-center justify-center gap-1.5 transition';
+        tabLeadBtn.className = 'flex-1 py-2 font-bold text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition';
+      });
+
+      // Connection Modal Open / Close
+      const modal = document.getElementById('conn-modal');
+      document.getElementById('btn-conn-modal').addEventListener('click', () => {
+        modal.classList.remove('hidden');
+      });
+      document.getElementById('btn-close-modal').addEventListener('click', () => {
+        modal.classList.add('hidden');
+      });
+
+      // Connect WebSocket button inside modal
+      document.getElementById('btn-connect-ws').addEventListener('click', () => {
+        const username = document.getElementById('input-tiktok-username').value.trim();
+        const wsUrl = document.getElementById('input-ws-url').value.trim() || ((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
+        if (!username) {
+          showToast('Vui lòng nhập tên tài khoản TikTok Live (@username)', 'warning');
+          return;
+        }
+        STATE.isAutoDemo = false; // Turn off auto simulation when connecting to real stream
+        document.getElementById('auto-btn-text').innerText = 'Tự Động Quẩy: TẮT';
+        document.getElementById('auto-spin-icon').style.display = 'none';
+        const panelKey = (document.getElementById('input-panel-key') || {}).value || '';
+        connectTikTokWebSocket(wsUrl, username, panelKey);
+      });
+
+      // Switch back to Demo button
+      document.getElementById('btn-switch-demo').addEventListener('click', () => {
+        if (STATE.ws) {
+          try { STATE.ws.close(); } catch (e) {}
+        }
+        STATE.isAutoDemo = true;
+        document.getElementById('auto-btn-text').innerText = 'Tự Động Quẩy: BẬT';
+        document.getElementById('auto-spin-icon').style.display = 'inline-block';
+        updateConnStatus('demo', 'Demo Mode');
+        document.getElementById('modal-status-text').innerHTML = `<span class="text-yellow-400">Đang ở chế độ Giả Lập (Demo)</span>`;
+        modal.classList.add('hidden');
+        runAutoSimulationTick();
+      });
+
+      // Copy backend server code snippet
+      document.getElementById('btn-copy-code').addEventListener('click', () => {
+        const snippet = document.getElementById('server-code-snippet').innerText;
+        const markCopied = () => {
+          document.getElementById('btn-copy-code').innerText = 'Đã sao chép!';
+          showToast('Đã sao chép code server!', 'info');
+          setTimeout(() => {
+            document.getElementById('btn-copy-code').innerText = 'Sao chép code';
+          }, 2000);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(snippet).then(markCopied).catch(() => {
+            fallbackCopy(snippet);
+            markCopied();
+          });
+        } else {
+          fallbackCopy(snippet);
+          markCopied();
+        }
+      });
+
+      function fallbackCopy(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch(e) {}
+        document.body.removeChild(ta);
+      }
+
+      // Click on canvas: if clicking near a dancer, zoom into them & trigger solo dance!
+      clubCanvas.addEventListener('click', (e) => {
+        initAudio();
+        const rect = clubCanvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        let clickedDancer = null;
+        let minDist = 55;
+        STATE.dancers.forEach(d => {
+          const pos = getDancerScreenPos(d);
+          const dist = Math.hypot(clickX - pos.x, clickY - (pos.y - 25 * pos.scale));
+          if (dist < minDist) {
+            minDist = dist;
+            clickedDancer = d;
+          }
+        });
+
+        if (clickedDancer) {
+          playSFX('scratch');
+          triggerCameraSpotlight(clickedDancer, 'Spotlight Solo 🌟', 99);
+        } else {
+          spawnHeart(clickX, clickY, 4);
+        }
+      });
+    }
+
+    // --- Initialization on Window Load ---
+    window.addEventListener('load', () => {
+      resizeCanvas();
+      setupEventListeners();
+
+      // WS mặc định: cùng server này (/ws)
+      try { const w = document.getElementById('input-ws-url'); if (w && !w.value) w.value = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws'; } catch (e) {}
+
+      // Seed initial crowd of dancers
+      MOCK_USERS.forEach(user => {
+        const dancer = getOrCreateDancer(user.u, user.n);
+        dancer.totalCoins = Math.floor(Math.random() * 300);
+      });
+      updateLeaderboard();
+
+      // Start Auto Simulation loop
+      runAutoSimulationTick();
+
+      // Start Canvas Render Loop
+      requestAnimationFrame(renderLoop);
+    });
+
+  </script>
+</body>
+</html>
