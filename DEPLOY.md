@@ -156,18 +156,15 @@ cổng **4193**, không chạm tới Sàn Vui cũ ở sanvui.bla.io.vn.
   Hoàng Tử Sàn, Nam Hải Phòng.
 - Ảnh gốc `.webp` ở `assets/` (local). Tách nền xanh → PNG trong suốt
   (alpha mềm theo độ xanh lá, crop sát người, resize rộng 256px) rồi
-  nhúng base64 vào `public/assets/dancer-sprites.js` (672KB) — vì
-  connector GitHub chỉ push được file text, không push được ảnh nhị
-  phân (tiền lệ: Ông Lão nhúng 8 ảnh nền base64). `.dockerignore` loại
-  `assets/*.webp` + `assets/*.png` khỏi image Docker.
-- Stage vẽ sprite thay cho bộ xương code khi vũ công có ảnh
-  (`DANCER_SPRITES[username]`, key = username như `huyen_trang`,
-  `thuy_tien_dj`, `dragon_master`, `anh_ba_sai_gon`, `phuc_vip`):
-  cao ~94×scale (bằng bộ xương cũ), nhún theo nhịp + lắc + nghiêng
-  nhẹ, solo to 1.15×; tên/tag/bong bóng chat vẫn vẽ như cũ; chưa có
-  ảnh thì vẽ bộ xương như cũ. Hạn chế: sprite là ảnh tĩnh nên không
-  xoay 360° / múa tay chân như bộ xương; tay áo dài của Đại Gia Rồng
-  với Anh Ba hơi chạm mép khung ảnh gốc (vẫn đủ dùng).
+  nhúng base64 vào `public/assets/dancer-sprites.js` (đủ 8 vũ công,
+  ~1.190KB) — vì connector GitHub chỉ push được file text, không push
+  được ảnh nhị phân (tiền lệ: Ông Lão nhúng 8 ảnh nền base64).
+  `.dockerignore` loại `assets/*.webp` + `assets/*.png` khỏi image Docker.
+  Đã gen ảnh xong 8/8 (thêm Linh Babie váy hồng bèo nơ, Hoàng Tử Sàn
+  blazer nhung tím + vương miện vàng, Nam Hải Phòng áo da đinh tán).
+  Lưu ý: Nam Hải Phòng tay buông xuôi (không A-pose) nhưng làm sprite
+  vẫn ổn; tay áo dài của Đại Gia Rồng với Anh Ba hơi chạm mép khung ảnh
+  gốc (vẫn đủ dùng).
 
 ## Checklist áp dụng cho bản demo HTML sau này (đại ca dặn 2026-11-07)
 
